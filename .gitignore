@@ -1,0 +1,17 @@
+# Binaires
+bin/
+freekiosk-hub
+
+# Configuration & Secrets
+.env
+*.env
+
+# Base de données
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Logs & OS
+*.log
+.DS_Store
