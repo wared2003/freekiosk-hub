@@ -96,7 +96,12 @@ func (s *ApiServer) setupRoutes() {
 	s.Echo.GET("/health", systemJsonH.HandleHealthCheck)
 
 	s.Echo.GET("/", homeH.HandleIndex)
-	s.Echo.GET("/tablets/:id", tabletH.HandleDetails)
+	tablets := s.Echo.Group("/tablets")
+	{
+		tablets.GET("/:id", tabletH.HandleDetails)
+		tablets.GET("/:id/groups-selection", groupH.HandleTabletGroupsSelection)
+		tablets.POST("/:tabletID/groups/:groupID/toggle", groupH.HandleToggleGroup)
+	}
 
 	groupRoutes := s.Echo.Group("/groups")
 	{

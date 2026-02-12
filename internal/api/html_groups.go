@@ -111,3 +111,44 @@ func (h *GroupHandler) HandleDeleteGroup(c echo.Context) error {
 	slog.Info("resource deleted: group removed", "id", id)
 	return c.NoContent(http.StatusOK)
 }
+
+// GET /tablets/:id/groups-selection
+func (h *GroupHandler) HandleTabletGroupsSelection(c echo.Context) error {
+	tabletID, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+
+	allGroups, _ := h.groupRepo.GetAll()
+	currentGroups, _ := h.groupRepo.GetGroupsByTablet(tabletID)
+
+	// On crée un set pour vérifier facilement si la tablette est déjà dans le groupe
+	selected := make(map[int64]bool)
+	for _, g := range currentGroups {
+		selected[g.ID] = true
+	}
+
+	return c.Render(http.StatusOK, "", ui.TabletGroupsModal(tabletID, allGroups, selected))
+}
+
+func (h *GroupHandler) HandleToggleGroup(c echo.Context) error {
+	tID, _ := strconv.ParseInt(c.Param("tabletID"), 10, 64)
+	gID, _ := strconv.ParseInt(c.Param("groupID"), 10, 64)
+
+	groups, _ := h.groupRepo.GetGroupsByTablet(tID)
+	exists := false
+	for _, g := range groups {
+		if g.ID == gID {
+			exists = true
+			break
+		}
+	}
+
+	if exists {
+		h.groupRepo.RemoveTabletFromGroup(tID, gID)
+		slog.Info("tablet removed from group", "tablet", tID, "group", gID)
+	} else {
+		h.groupRepo.AddTabletToGroup(tID, gID)
+		slog.Info("tablet added to group", "tablet", tID, "group", gID)
+	}
+
+	c.Response().Header().Set("HX-Trigger", "groups-changed")
+	return c.NoContent(http.StatusOK)
+}

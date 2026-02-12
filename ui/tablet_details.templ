@@ -62,11 +62,12 @@ templ TabletDetails(t *models.TabletDisplay, history []repositories.TabletReport
 }
 
 templ TabletDetailsContent(t *models.TabletDisplay, history []repositories.TabletReport) {
+    <div id="modal-container"></div>
     <div hx-ext="sse" sse-connect={ fmt.Sprintf("/sse/tablet/%d", t.ID) }>
         <div 
             id="details-container"
             hx-get={ fmt.Sprintf("/tablets/%d?refresh=true", t.ID) } 
-            hx-trigger="sse:update"
+            hx-trigger="sse:update, groups-changed from:body"
             hx-target="this" 
             hx-swap="innerHTML"
             class="px-6 pb-12 space-y-6"
@@ -90,18 +91,34 @@ templ TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport
         <div class="flex items-center gap-4">
             <div class={ "w-4 h-4 rounded-full shadow-inner ", getStatusColor(t.Online) }></div>
             <div>
-                <h1 class="text-3xl font-black tracking-tight text-slate-800">{ t.Name }</h1>
-                <p class="text-xs font-mono opacity-50">Hub: { t.IP } | Local: { deviceIP }</p>
-                if len(t.Groups) > 0 {
-                     <div class="h-4 w-[1px] bg-slate-200 mx-1"></div> for _, g := range t.Groups {
-                    @GroupBadge(g)
-                    }
-                } else {
-                    <span class="text-[10px] text-slate-300 italic">Aucun groupe assigné</span>
-                }
+                <div class="flex items-center gap-3">
+                    <h1 class="text-3xl font-black tracking-tight text-slate-800">{ t.Name }</h1>
+                    <div class="flex gap-1">
+                        if len(t.Groups) > 0 {
+                            for _, g := range t.Groups {
+                                @GroupBadge(g)
+                            }
+                        }
+                    </div>
+                </div>
+                <p class="text-xs font-mono opacity-50 mt-1">Hub: { t.IP } | Local: { deviceIP }</p>
             </div>
         </div>
-        <div class="flex gap-2">
+        
+        <div class="flex items-center gap-2">
+            <button 
+                hx-get={ fmt.Sprintf("/tablets/%d/groups-selection", t.ID) } 
+                hx-target="#modal-container"
+                class="btn btn-sm btn-outline gap-2 border-slate-200"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                Groups
+            </button>
+
+            <div class="divider divider-horizontal mx-0"></div>
+
             <button class="btn btn-sm btn-primary">📸 Capture</button>
             <button class="btn btn-sm btn-outline text-error hover:bg-error">🔄 Reboot</button>
         </div>
@@ -383,6 +400,34 @@ templ GroupBadge(g repositories.Group) {
     >
         { g.Name }
     </span>
+}
+
+templ TabletGroupsModal(tabletID int64, allGroups []repositories.Group, selected map[int64]bool) {
+    <dialog id="selection_modal" class="modal modal-open">
+        <div class="modal-box max-w-sm">
+            <h3 class="font-bold text-lg mb-4">Assign to Groups</h3>
+            <div class="space-y-2">
+                for _, g := range allGroups {
+                    <div class="flex items-center justify-between p-2 border rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full" style={ "background-color:" + g.Color }></div>
+                            <span class="text-sm font-medium">{ g.Name }</span>
+                        </div>
+                        <input 
+                            type="checkbox" 
+                            class="checkbox checkbox-primary checkbox-sm"
+                            checked?={ selected[g.ID] }
+                            hx-post={ fmt.Sprintf("/tablets/%d/groups/%d/toggle", tabletID, g.ID) }
+                            hx-swap="none"
+                        />
+                    </div>
+                }
+            </div>
+            <div class="modal-action">
+                <button class="btn" onclick="this.closest('dialog').remove()">Done</button>
+            </div>
+        </div>
+    </dialog>
 }
 
 func getSignalColor(level int) string {
