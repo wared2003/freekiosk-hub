@@ -120,6 +120,9 @@ func (s *ApiServer) setupRoutes() {
 		tablets.POST("/:id/command/beep", tabletH.HandleBeep)
 		tablets.POST("/:id/command/reload", tabletH.HandleReload)
 		tablets.POST("/:id/command/reboot", tabletH.HandleReboot)
+		tablets.POST("/:id/command/wake", tabletH.HandleWakeUp)
+		tablets.POST("/:id/command/screen-status", tabletH.HandleScreenStatus)
+		tablets.POST("/:id/command/screensaver-status", tabletH.HandleScreenSaver)
 		tablets.POST("/:id/command/navigate", tabletH.HandleNavigate)
 		tablets.GET("/:id/navigate-modal", tabletH.HandleNavigateModal)
 

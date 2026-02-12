@@ -177,3 +177,98 @@ func (h *HtmlTabletHandler) HandleNavigate(c echo.Context) error {
 	c.Response().Header().Set("HX-Trigger", "update")
 	return nil
 }
+
+func (h *HtmlTabletHandler) HandleWakeUp(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return ui.Toast("invalid tablet id ", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	report, err := h.kService.Wake(services.Target{TabletID: id})
+	if err != nil {
+		return ui.Toast("Error : "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.Toast(fmt.Sprintf("⏰ %s : Waked up", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.Toast(fmt.Sprintf("❌ %s : error waking up", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+
+	return nil
+}
+
+func (h *HtmlTabletHandler) HandleScreenStatus(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return ui.Toast("Invalid tablet ID", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	statusRaw := c.FormValue("status")
+	var shouldBeOn bool
+	switch statusRaw {
+	case "true", "on":
+		shouldBeOn = true
+	case "false", "off":
+		shouldBeOn = false
+	default:
+		return ui.Toast("err: invalid request", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	report, err := h.kService.SetScreen(services.Target{TabletID: id}, shouldBeOn)
+	if err != nil {
+		ui.ScreenStatusBox(!shouldBeOn, id).Render(c.Request().Context(), c.Response().Writer)
+		return ui.Toast("Error: "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.ScreenStatusBox(shouldBeOn, id).Render(c.Request().Context(), c.Response().Writer)
+			ui.Toast(fmt.Sprintf("%s :screen command send", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.ScreenStatusBox(!shouldBeOn, id).Render(c.Request().Context(), c.Response().Writer)
+			ui.Toast(fmt.Sprintf("❌ %s: send screen command failed", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+	return nil
+}
+
+func (h *HtmlTabletHandler) HandleScreenSaver(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return ui.Toast("Invalid tablet ID", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	statusRaw := c.FormValue("status")
+	var shouldBeOn bool
+	switch statusRaw {
+	case "true", "on":
+		shouldBeOn = true
+	case "false", "off":
+		shouldBeOn = false
+	default:
+		return ui.Toast("err: invalid request", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	report, err := h.kService.SetScreensaver(services.Target{TabletID: id}, shouldBeOn)
+	if err != nil {
+		ui.ScreensaverStatusBox(!shouldBeOn, id).Render(c.Request().Context(), c.Response().Writer)
+		return ui.Toast("Error: "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.ScreensaverStatusBox(shouldBeOn, id).Render(c.Request().Context(), c.Response().Writer)
+			ui.Toast(fmt.Sprintf("%s :screensaver command send", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.ScreensaverStatusBox(!shouldBeOn, id).Render(c.Request().Context(), c.Response().Writer)
+			ui.Toast(fmt.Sprintf("❌ %s: send screensaver command failed", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+	return nil
+}
