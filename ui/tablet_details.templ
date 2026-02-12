@@ -60,6 +60,7 @@ templ TabletDetails(t *repositories.Tablet, last *repositories.TabletReport, his
     }
 }
 
+// Cette partie gère l'enveloppe SSE. Elle n'est appelée qu'une fois (Page ou Navigation HTMX)
 templ TabletDetailsContent(t *repositories.Tablet, last *repositories.TabletReport, history []repositories.TabletReport) {
     <div hx-ext="sse" sse-connect={ fmt.Sprintf("/sse/tablet/%d", t.ID) }>
         <div 
