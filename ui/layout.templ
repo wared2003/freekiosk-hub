@@ -22,31 +22,48 @@ templ Layout(title string) {
         </head>
         <body class="min-h-screen bg-slate-50 text-slate-900 font-sans">
             <div class="sticky top-0 z-50 glass-nav">
-                <div class="navbar max-w-7xl mx-auto px-4">
-                    <div class="flex-1 gap-2">
-                        <div class="bg-primary text-primary-content p-2 rounded-xl shadow-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                            </svg>
+                    <div class="navbar max-w-7xl mx-auto px-4">
+                        <div class="flex-1 gap-2">
+                            <div class="bg-primary text-primary-content p-2 rounded-xl shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                                </svg>
+                            </div>
+                            <a hx-get="/" 
+                            hx-target="main" 
+                            hx-push-url="true" 
+                            class="text-xl font-black tracking-tighter uppercase ml-2 cursor-pointer">
+                                FreeKiosk<span class="text-primary">Hub</span>
+                            </a>
                         </div>
-                        <a href="/" class="text-xl font-black tracking-tighter uppercase ml-2">
-                            FreeKiosk<span class="text-primary">Hub</span>
-                        </a>
-                    </div>
-                    
-                    <div class="flex-none gap-4">
-                        <ul class="menu menu-horizontal px-1 font-medium gap-1">
-                            <li><a href="/" class="rounded-lg hover:bg-primary/10 transition-colors">Tableau de bord</a></li>
-                            <li><a href="/admin/import" class="rounded-lg hover:bg-primary/10 transition-colors">Importation</a></li>
-                        </ul>
-                        <div class="avatar placeholder">
-                            <div class="bg-neutral text-neutral-content rounded-full w-8">
-                                <span class="text-xs">FK</span>
+                        
+                        <div class="flex-none gap-4">
+                            <ul class="menu menu-horizontal px-1 font-medium gap-1">
+                                <li>
+                                    <a hx-get="/" 
+                                    hx-target="main" 
+                                    hx-push-url="true" 
+                                    class="rounded-lg hover:bg-primary/10 transition-colors cursor-pointer">
+                                    Tableau de bord
+                                    </a>
+                                </li>
+                                <li>
+                                    <a hx-get="/admin/import" 
+                                    hx-target="main" 
+                                    hx-push-url="true" 
+                                    class="rounded-lg hover:bg-primary/10 transition-colors cursor-pointer">
+                                    Importation
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="avatar placeholder">
+                                <div class="bg-neutral text-neutral-content rounded-full w-8">
+                                    <span class="text-xs">FK</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
             <main class="max-w-7xl mx-auto py-8" id="main-container">
                 { children... }

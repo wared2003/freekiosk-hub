@@ -34,8 +34,10 @@ func (h *HtmlHomeHandler) HandleIndex(c echo.Context) error {
 		})
 	}
 
-	// Si c'est du HTMX, on rend le template Dashboard seul
-	// Sinon, on rend le template Dashboard "complet" (le template gère le layout)
+	if c.QueryParam("refresh") == "true" {
+		return ui.DashboardGrid(displayList).Render(c.Request().Context(), c.Response().Writer)
+	}
+
 	FullPage := c.Request().Header.Get("HX-Request") != "true"
 
 	return c.Render(http.StatusOK, "", ui.Dashboard(displayList, FullPage))

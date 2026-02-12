@@ -16,6 +16,7 @@ templ Dashboard(tablets []models.TabletDisplay, fullPage bool) {
     }
 }
 
+// Le wrapper SSE fixe
 templ DashboardContent(tablets []models.TabletDisplay) {
     <div class="px-6" id="dashboard-container" hx-ext="sse" sse-connect="/sse/global">
         <header class="mb-8 flex justify-between items-end">
@@ -32,19 +33,24 @@ templ DashboardContent(tablets []models.TabletDisplay) {
             </div>
         </header>
         
-        <div 
-            id="tablet-grid"
-            hx-get="/" 
-            hx-trigger="sse:update" 
-            hx-target="#tablet-grid" 
-            hx-select="#tablet-grid"
-            hx-swap="innerHTML"
-            class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-        >
-            for _, td := range tablets {
-                @TabletCard(td)
-            }
-        </div>
+        // On isole la grille ici
+        @DashboardGrid(tablets)
+    </div>
+}
+
+// La partie rafraîchie par le SSE
+templ DashboardGrid(tablets []models.TabletDisplay) {
+    <div 
+        id="tablet-grid"
+        hx-get="/?refresh=true" 
+        hx-trigger="sse:update" 
+        hx-target="this" 
+        hx-swap="outerHTML"
+        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+    >
+        for _, td := range tablets {
+            @TabletCard(td)
+        }
     </div>
 }
 

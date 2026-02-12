@@ -123,7 +123,7 @@ func (s *ApiServer) setupRoutes() {
 			select {
 			case <-ch:
 				// On envoie l'event "refresh"
-				fmt.Fprintf(c.Response().Writer, "event: refresh\ndata: \n\n")
+				fmt.Fprintf(c.Response().Writer, "event: update\ndata: \n\n")
 				c.Response().Flush()
 			case <-c.Request().Context().Done():
 				return nil
