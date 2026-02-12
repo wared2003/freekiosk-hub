@@ -118,6 +118,11 @@ func (s *ApiServer) setupRoutes() {
 
 		//commands
 		tablets.POST("/:id/command/beep", tabletH.HandleBeep)
+		tablets.POST("/:id/command/reload", tabletH.HandleReload)
+		tablets.POST("/:id/command/reboot", tabletH.HandleReboot)
+		tablets.POST("/:id/command/navigate", tabletH.HandleNavigate)
+		tablets.GET("/:id/navigate-modal", tabletH.HandleNavigateModal)
+
 	}
 
 	groupRoutes := s.Echo.Group("/groups")

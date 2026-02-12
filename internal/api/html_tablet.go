@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"freekiosk-hub/internal/models"
@@ -61,30 +62,118 @@ func (h *HtmlTabletHandler) HandleDetails(c echo.Context) error {
 }
 
 func (h *HtmlTabletHandler) HandleBeep(c echo.Context) error {
-	// 1. Récupérer l'ID de la tablette depuis l'URL
 	idParam := c.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		return ui.Toast("ID de tablette invalide", "error").Render(c.Request().Context(), c.Response().Writer)
+		return ui.Toast("invalid tablet id", "error").Render(c.Request().Context(), c.Response().Writer)
 	}
 
-	// 2. Appeler le service Beep sur cette cible unique
-	// Le service gère déjà le parallélisme et la validation du champ "executed"
 	report, err := h.kService.Beep(services.Target{TabletID: id})
 	if err != nil {
-		// Erreur de résolution (ex: tablette non trouvée en DB)
-		return ui.Toast("Erreur : "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+		return ui.Toast("error : "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
 	}
 
-	// 3. Générer les toasts basés sur le rapport de résultat
-	// (Ici on n'a qu'un résultat car on cible un ID unique)
 	for _, res := range report.Results {
 		if res.Executed {
-			ui.Toast(fmt.Sprintf("🔔 %s : Beep envoyé !", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+			ui.Toast(fmt.Sprintf("🔔 %s : Beep Send !", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
 		} else {
-			ui.Toast(fmt.Sprintf("❌ %s : Échec du Beep ", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+			ui.Toast(fmt.Sprintf("❌ %s : Error sending Beep ", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
 		}
 	}
 
+	return nil
+}
+
+func (h *HtmlTabletHandler) HandleReload(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return ui.Toast("invalid tablet id ", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	report, err := h.kService.Reload(services.Target{TabletID: id})
+	if err != nil {
+		return ui.Toast("Erreur : "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.Toast(fmt.Sprintf("🔄 %s : Reloading...", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.Toast(fmt.Sprintf("❌ %s : error reloading", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+
+	return nil
+}
+
+func (h *HtmlTabletHandler) HandleReboot(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return ui.Toast("invalid tablet id ", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	report, err := h.kService.Reboot(services.Target{TabletID: id})
+	if err != nil {
+		return ui.Toast("Erreur : "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.Toast(fmt.Sprintf("🔄 %s : Rebooting", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.Toast(fmt.Sprintf("❌ %s : error reboot failed", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+
+	return nil
+}
+
+func (h *HtmlTabletHandler) HandleNavigateModal(c echo.Context) error {
+	idParam := c.Param("id")
+	id, _ := strconv.ParseInt(idParam, 10, 64)
+
+	// On peut optionnellement récupérer l'URL actuelle depuis la DB/Cache
+	// pour pré-remplir l'input
+	currentURL := ""
+
+	return ui.NavigateModal(id, currentURL).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *HtmlTabletHandler) HandleNavigate(c echo.Context) error {
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return ui.Toast("Invalid tablet ID", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	newURL := c.FormValue("url")
+	if newURL == "" {
+		return ui.Toast("URL cannot be empty", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	parsedURL, err := url.ParseRequestURI(newURL)
+	if err != nil {
+		return ui.Toast("Invalid URL format", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+		return ui.Toast("Forbidden protocol: Use HTTP or HTTPS", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	report, err := h.kService.Navigate(services.Target{TabletID: id}, parsedURL.String())
+	if err != nil {
+		return ui.Toast("Error: "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.Toast(fmt.Sprintf("🌐 %s: URL updated!", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.Toast(fmt.Sprintf("❌ %s: Update failed", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+	c.Response().Header().Set("HX-Trigger", "update")
 	return nil
 }

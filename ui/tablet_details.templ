@@ -7,6 +7,15 @@ import (
 	"freekiosk-hub/internal/models"
 )
 
+type ButtonVariant string
+
+const (
+    BtnNormal  ButtonVariant = "info"
+    BtnWarning ButtonVariant = "warning"
+    BtnDanger  ButtonVariant = "error"
+    BtnPrimary ButtonVariant = "primary"
+)
+
 // --- Fonctions utilitaires inchangées ---
 
 func boolToText(cond bool, yes, no string) string {
@@ -67,7 +76,7 @@ templ TabletDetailsContent(t *models.TabletDisplay, history []repositories.Table
         <div 
             id="details-container"
             hx-get={ fmt.Sprintf("/tablets/%d?refresh=true", t.ID) } 
-            hx-trigger="sse:update, groups-changed from:body"
+            hx-trigger="sse:update, update from:body"
             hx-target="this" 
             hx-swap="innerHTML"
             class="px-6 pb-12 space-y-6"
@@ -109,8 +118,7 @@ templ TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport
             <button 
                 hx-get={ fmt.Sprintf("/tablets/%d/groups-selection", t.ID) } 
                 hx-target="#modal-container"
-                class="btn btn-sm btn-outline gap-2 border-slate-200"
-            >
+                class="btn btn-sm btn-outline gap-2 border-slate-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                 </svg>
@@ -118,22 +126,10 @@ templ TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport
             </button>
 
             <div class="divider divider-horizontal mx-0"></div>
-
-            <button 
-                hx-post={ fmt.Sprintf("/tablets/%d/command/beep", t.ID) }
-                hx-swap="none"
-                class="btn btn-sm btn-ghost gap-2 text-info hover:bg-info/10"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                </svg>
-                Beep
-            </button>
-
-            <button class="btn btn-sm btn-primary">📸 Capture</button>
-            if t.LastReport.IsDeviceOwner {
-                <button class="btn btn-sm btn-outline text-error hover:bg-error">🔄 Reboot</button>
-            }
+            @ActionButton("Beep", IconBeep(), fmt.Sprintf("/tablets/%d/command/beep", t.ID), "POST", BtnNormal)
+            @ActionButton("Capture", IconCamera(), "#", "POST", BtnNormal)
+            @ActionButton("Reload", IconReload(), fmt.Sprintf("/tablets/%d/command/reload", t.ID), "POST", BtnWarning)           
+            @ActionButton("Reboot", nil, fmt.Sprintf("/tablets/%d/command/reboot", t.ID), "POST", BtnDanger)
         </div>
     </div>
 
@@ -141,7 +137,7 @@ templ TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport
         if t.LastReport != nil {
             <div class="xl:col-span-3 space-y-6">
                 @SectionDisplay(t.LastReport)
-                @SectionWebview(t.LastReport)
+                @SectionWebview(t)
             </div>
 
             <div class="xl:col-span-3 space-y-6">
@@ -222,21 +218,34 @@ templ SectionDisplay(last *repositories.TabletReport) {
     </div>
 }
 
-templ SectionWebview(last *repositories.TabletReport) {
+templ SectionWebview(tab *models.TabletDisplay) {
     <div class="card bg-base-100 border border-base-200 shadow-sm">
         <div class="card-body p-5">
-            <h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">Webview </h3>
-            <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 mb-3 text-xs font-mono break-all text-blue-700">
-                if last.CurrentURL != "" {
-                     { last.CurrentURL }
-                }else {
+            <h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">Webview</h3>
+            
+            <div 
+                class="p-3 bg-blue-50 rounded-lg border border-blue-100 mb-3 text-xs font-mono break-all text-blue-700 cursor-pointer hover:bg-blue-100 transition-colors group relative"
+                hx-get={ fmt.Sprintf("/tablets/%d/navigate-modal", tab.ID) }
+                hx-target="#modal-container"
+                hx-trigger="click"
+                title="Click to edit URL"
+            >
+                if tab.LastReport != nil && tab.LastReport.CurrentURL != "" {
+                    { tab.LastReport.CurrentURL }
+                } else {
                     <span class="italic opacity-50">No URL loaded</span>
                 }
+                <span class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 text-[10px] bg-blue-200 px-1 rounded transition-opacity">EDIT</span>
             </div>
+
             <div class="space-y-1">
-                @detailRow("Status", boolToText(last.WebviewLoading, "Loading", "Loaded"))
-                @detailRow("Kiosk Mode", boolToText(last.KioskMode, "Activé", "Désactivé"))
-                @detailRow("Can Go Back", boolToText(last.WebviewCanGoBack, "Yes", "No"))
+                if tab.LastReport != nil {
+                    @detailRow("Status", boolToText(tab.LastReport.WebviewLoading, "Loading", "Loaded"))
+                    @detailRow("Kiosk Mode", boolToText(tab.LastReport.KioskMode, "Active", "Disabled"))
+                    @detailRow("Can Go Back", boolToText(tab.LastReport.WebviewCanGoBack, "Yes", "No"))
+                } else {
+                    <div class="text-xs opacity-50 text-center py-2">No report data available</div>
+                }
             </div>
         </div>
     </div>
@@ -443,9 +452,82 @@ templ TabletGroupsModal(tabletID int64, allGroups []repositories.Group, selected
     </dialog>
 }
 
+
+
+templ ActionButton(label string, icon templ.Component, action string, method string, variant ButtonVariant) {
+    <button 
+        hx-target={ boolToText(method == "GET", "#modal-container", "") }
+        { templ.Attributes{ "hx-"+method: action }... }
+        hx-swap={ boolToText(method == "GET", "innerHTML", "none") }
+        class={ 
+            "btn btn-sm gap-2 transition-all",
+            boolToText(variant == BtnNormal, "btn-ghost text-info hover:bg-info/10", ""),
+            boolToText(variant == BtnWarning, "btn-ghost text-warning hover:bg-warning/10", ""),
+            boolToText(variant == BtnDanger, "btn-outline text-error hover:bg-error hover:text-white", ""),
+            boolToText(variant == BtnPrimary, "btn-primary", ""),
+        }
+    >
+        if icon != nil {
+            @icon
+        }
+        { label }
+    </button>
+}
+
 func getSignalColor(level int) string {
     if level >= 75 { return "text-success" }
     if level >= 40 { return "text-warning" }
     return "text-error"
 }
 
+templ IconReload() {
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
+}
+
+templ IconBeep() {
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+    </svg>
+}
+
+templ IconCamera() {
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+}
+
+templ NavigateModal(tabletID int64, currentURL string) {
+    <dialog id="nav_modal" class="modal modal-open">
+        <div class="modal-box border border-slate-200 shadow-2xl">
+            <h3 class="font-bold text-lg mb-4">Update WebView URL</h3>
+            
+            <form hx-post={ fmt.Sprintf("/tablets/%d/command/navigate", tabletID) } hx-swap="none" onsubmit="nav_modal.close()">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-semibold">Target URL</span>
+                    </label>
+                    <input 
+                        type="url" 
+                        name="url" 
+                        value={ currentURL } 
+                        placeholder="https://..." 
+                        class="input input-bordered w-full focus:input-primary" 
+                        required 
+                        autofocus
+                    />
+                </div>
+                
+                <div class="modal-action">
+                    <button type="button" class="btn btn-ghost" onclick="const m = this.closest('dialog'); m.remove()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" onclick="const m = this.closest('dialog'); setTimeout(() => m.remove(), 100)">Update</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button onclick="const m = this.closest('dialog'); m.remove()">close</button>
+        </form>
+    </dialog>
+}

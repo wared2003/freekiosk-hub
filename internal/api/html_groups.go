@@ -149,6 +149,6 @@ func (h *GroupHandler) HandleToggleGroup(c echo.Context) error {
 		slog.Info("tablet added to group", "tablet", tID, "group", gID)
 	}
 
-	c.Response().Header().Set("HX-Trigger", "groups-changed")
+	c.Response().Header().Set("HX-Trigger", "update")
 	return c.NoContent(http.StatusOK)
 }

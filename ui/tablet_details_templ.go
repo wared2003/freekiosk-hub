@@ -15,6 +15,15 @@ import (
 	"freekiosk-hub/internal/repositories"
 )
 
+type ButtonVariant string
+
+const (
+	BtnNormal  ButtonVariant = "info"
+	BtnWarning ButtonVariant = "warning"
+	BtnDanger  ButtonVariant = "error"
+	BtnPrimary ButtonVariant = "primary"
+)
+
 // --- Fonctions utilitaires inchangées ---
 
 func boolToText(cond bool, yes, no string) string {
@@ -142,7 +151,7 @@ func TabletDetailsContent(t *models.TabletDisplay, history []repositories.Tablet
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/sse/tablet/%d", t.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 66, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 75, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -155,13 +164,13 @@ func TabletDetailsContent(t *models.TabletDisplay, history []repositories.Tablet
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d?refresh=true", t.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 69, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 78, Col: 66}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-trigger=\"sse:update, groups-changed from:body\" hx-target=\"this\" hx-swap=\"innerHTML\" class=\"px-6 pb-12 space-y-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" hx-trigger=\"sse:update, update from:body\" hx-target=\"this\" hx-swap=\"innerHTML\" class=\"px-6 pb-12 space-y-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -232,7 +241,7 @@ func TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport)
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(t.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 95, Col: 90}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 104, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -257,7 +266,7 @@ func TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport)
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(t.IP)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 104, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 113, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -270,7 +279,7 @@ func TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport)
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(deviceIP)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 104, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 113, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -283,41 +292,38 @@ func TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport)
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/groups-selection", t.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 110, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 119, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-target=\"#modal-container\" class=\"btn btn-sm btn-outline gap-2 border-slate-200\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z\"></path></svg> Groups</button><div class=\"divider divider-horizontal mx-0\"></div><button hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "\" hx-target=\"#modal-container\" class=\"btn btn-sm btn-outline gap-2 border-slate-200\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z\"></path></svg> Groups</button><div class=\"divider divider-horizontal mx-0\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/beep", t.ID))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 123, Col: 71}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		templ_7745c5c3_Err = ActionButton("Beep", IconBeep(), fmt.Sprintf("/tablets/%d/command/beep", t.ID), "POST", BtnNormal).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" hx-swap=\"none\" class=\"btn btn-sm btn-ghost gap-2 text-info hover:bg-info/10\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z\"></path></svg> Beep</button> <button class=\"btn btn-sm btn-primary\">📸 Capture</button> ")
+		templ_7745c5c3_Err = ActionButton("Capture", IconCamera(), "#", "POST", BtnNormal).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if t.LastReport.IsDeviceOwner {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<button class=\"btn btn-sm btn-outline text-error hover:bg-error\">🔄 Reboot</button>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		templ_7745c5c3_Err = ActionButton("Reload", IconReload(), fmt.Sprintf("/tablets/%d/command/reload", t.ID), "POST", BtnWarning).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><div class=\"grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-12 gap-6\">")
+		templ_7745c5c3_Err = ActionButton("Reboot", nil, fmt.Sprintf("/tablets/%d/command/reboot", t.ID), "POST", BtnDanger).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div><div class=\"grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-12 gap-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if t.LastReport != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"xl:col-span-3 space-y-6\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"xl:col-span-3 space-y-6\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -325,11 +331,11 @@ func TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = SectionWebview(t.LastReport).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = SectionWebview(t).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><div class=\"xl:col-span-3 space-y-6\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div><div class=\"xl:col-span-3 space-y-6\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -345,56 +351,56 @@ func TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</div><div class=\"xl:col-span-6 space-y-6\"><div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-6\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"font-bold text-slate-800\">Historique Principal</h3><select id=\"chartSelector1\" class=\"select select-bordered select-sm\" autocomplete=\"off\"><option value=\"battery\">🔋 Batterie %</option> <option value=\"wifi\">📶 WiFi (dBm)</option> <option value=\"mem\">🧠 RAM %</option> <option value=\"storage\">💾 Stockage %</option> <option value=\"connection\">🟢 Status</option></select></div><div class=\"h-[250px]\"><canvas id=\"historyChart1\" data-history=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div><div class=\"xl:col-span-6 space-y-6\"><div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-6\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"font-bold text-slate-800\">Historique Principal</h3><select id=\"chartSelector1\" class=\"select select-bordered select-sm\" autocomplete=\"off\"><option value=\"battery\">🔋 Batterie %</option> <option value=\"wifi\">📶 WiFi (dBm)</option> <option value=\"mem\">🧠 RAM %</option> <option value=\"storage\">💾 Stockage %</option> <option value=\"connection\">🟢 Status</option></select></div><div class=\"h-[250px]\"><canvas id=\"historyChart1\" data-history=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var13 string
+			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(historyData)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 163, Col: 81}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\"></canvas></div></div></div><div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-6\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"font-bold text-slate-800\">Historique Secondaire</h3><select id=\"chartSelector2\" class=\"select select-bordered select-sm\" autocomplete=\"off\"><option value=\"connection\">🟢 Status</option> <option value=\"wifi\">📶 WiFi (dBm)</option> <option value=\"battery\">🔋 Batterie %</option> <option value=\"mem\">🧠 RAM %</option> <option value=\"storage\">💾 Stockage %</option></select></div><div class=\"h-[250px]\"><canvas id=\"historyChart2\" data-history=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(historyData)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 167, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 181, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\"></canvas></div></div></div><div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-6\"><div class=\"flex justify-between items-center mb-4\"><h3 class=\"font-bold text-slate-800\">Historique Secondaire</h3><select id=\"chartSelector2\" class=\"select select-bordered select-sm\" autocomplete=\"off\"><option value=\"connection\">🟢 Status</option> <option value=\"wifi\">📶 WiFi (dBm)</option> <option value=\"battery\">🔋 Batterie %</option> <option value=\"mem\">🧠 RAM %</option> <option value=\"storage\">💾 Stockage %</option></select></div><div class=\"h-[250px]\"><canvas id=\"historyChart2\" data-history=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "\"></canvas></div></div></div><div class=\"collapse collapse-arrow bg-neutral text-neutral-content shadow-xl overflow-hidden\"><input type=\"checkbox\"><div class=\"collapse-title text-sm font-bold opacity-80\">📦 Rapport JSON brut</div><div class=\"collapse-content\"><pre id=\"rawJson\" class=\"text-[11px] font-mono bg-black/40 p-4 rounded-xl overflow-x-auto max-h-[300px]\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(historyData)
+			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(rawJSON)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 185, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 190, Col: 138}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\"></canvas></div></div></div><div class=\"collapse collapse-arrow bg-neutral text-neutral-content shadow-xl overflow-hidden\"><input type=\"checkbox\"><div class=\"collapse-title text-sm font-bold opacity-80\">📦 Rapport JSON brut</div><div class=\"collapse-content\"><pre id=\"rawJson\" class=\"text-[11px] font-mono bg-black/40 p-4 rounded-xl overflow-x-auto max-h-[300px]\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var16 string
-			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(rawJSON)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 194, Col: 138}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</pre></div></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</pre></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"lg:col-span-12 alert alert-warning\">Waiting for device connection...</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"lg:col-span-12 alert alert-warning\">Waiting for device connection...</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -423,12 +429,12 @@ func SectionDisplay(last *repositories.TabletReport) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var17 == nil {
-			templ_7745c5c3_Var17 = templ.NopComponent
+		templ_7745c5c3_Var16 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var16 == nil {
+			templ_7745c5c3_Var16 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">screen & audio</h3><div class=\"grid grid-cols-2 gap-3 mb-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">screen & audio</h3><div class=\"grid grid-cols-2 gap-3 mb-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -448,7 +454,7 @@ func SectionDisplay(last *repositories.TabletReport) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</div><div class=\"space-y-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div><div class=\"space-y-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -460,7 +466,7 @@ func SectionDisplay(last *repositories.TabletReport) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -468,7 +474,7 @@ func SectionDisplay(last *repositories.TabletReport) templ.Component {
 	})
 }
 
-func SectionWebview(last *repositories.TabletReport) templ.Component {
+func SectionWebview(tab *models.TabletDisplay) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -484,48 +490,80 @@ func SectionWebview(last *repositories.TabletReport) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var17 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var17 == nil {
+			templ_7745c5c3_Var17 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">Webview </h3><div class=\"p-3 bg-blue-50 rounded-lg border border-blue-100 mb-3 text-xs font-mono break-all text-blue-700\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">Webview</h3><div class=\"p-3 bg-blue-50 rounded-lg border border-blue-100 mb-3 text-xs font-mono break-all text-blue-700 cursor-pointer hover:bg-blue-100 transition-colors group relative\" hx-get=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if last.CurrentURL != "" {
+		var templ_7745c5c3_Var18 string
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/navigate-modal", tab.ID))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 228, Col: 74}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-target=\"#modal-container\" hx-trigger=\"click\" title=\"Click to edit URL\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if tab.LastReport != nil && tab.LastReport.CurrentURL != "" {
 			var templ_7745c5c3_Var19 string
-			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(last.CurrentURL)
+			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(tab.LastReport.CurrentURL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 231, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 234, Col: 47}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<span class=\"italic opacity-50\">No URL loaded</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<span class=\"italic opacity-50\">No URL loaded</span> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</div><div class=\"space-y-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<span class=\"absolute right-2 top-2 opacity-0 group-hover:opacity-100 text-[10px] bg-blue-200 px-1 rounded transition-opacity\">EDIT</span></div><div class=\"space-y-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = detailRow("Status", boolToText(last.WebviewLoading, "Loading", "Loaded")).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
+		if tab.LastReport != nil {
+			templ_7745c5c3_Err = detailRow("Status", boolToText(tab.LastReport.WebviewLoading, "Loading", "Loaded")).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = detailRow("Kiosk Mode", boolToText(tab.LastReport.KioskMode, "Active", "Disabled")).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = detailRow("Can Go Back", boolToText(tab.LastReport.WebviewCanGoBack, "Yes", "No")).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"text-xs opacity-50 text-center py-2\">No report data available</div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
-		templ_7745c5c3_Err = detailRow("Kiosk Mode", boolToText(last.KioskMode, "Activé", "Désactivé")).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = detailRow("Can Go Back", boolToText(last.WebviewCanGoBack, "Yes", "No")).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -554,38 +592,38 @@ func SectionNetwork(last *repositories.TabletReport) templ.Component {
 			templ_7745c5c3_Var20 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">WiFi & Network</h3>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">WiFi & Network</h3>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if last.WifiConnected {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"mb-4 p-3 bg-base-200/50 rounded-lg\"><p class=\"text-[10px] uppercase opacity-50 mb-1\">Connected to</p><p class=\"text-sm font-mono font-bold truncate\" title=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<div class=\"mb-4 p-3 bg-base-200/50 rounded-lg\"><p class=\"text-[10px] uppercase opacity-50 mb-1\">Connected to</p><p class=\"text-sm font-mono font-bold truncate\" title=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(last.WifiSSID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 252, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 261, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(last.WifiSSID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 253, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 262, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</p></div><div class=\"grid grid-cols-2 gap-3 mb-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</p></div><div class=\"grid grid-cols-2 gap-3 mb-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -594,7 +632,7 @@ func SectionNetwork(last *repositories.TabletReport) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "<div class=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<div class=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -607,7 +645,7 @@ func SectionNetwork(last *repositories.TabletReport) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -615,7 +653,7 @@ func SectionNetwork(last *repositories.TabletReport) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -623,7 +661,7 @@ func SectionNetwork(last *repositories.TabletReport) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</div><div class=\"grid grid-cols-2 gap-3 mb-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</div><div class=\"grid grid-cols-2 gap-3 mb-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -635,17 +673,17 @@ func SectionNetwork(last *repositories.TabletReport) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<div class=\"p-4 text-center border-2 border-dashed border-base-200 rounded-lg mb-4\"><p class=\"text-sm opacity-50\">WiFi Disconnected</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"p-4 text-center border-2 border-dashed border-base-200 rounded-lg mb-4\"><p class=\"text-sm opacity-50\">WiFi Disconnected</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -674,7 +712,7 @@ func SectionSystem(last *repositories.TabletReport) templ.Component {
 			templ_7745c5c3_Var25 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">Système</h3>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">Système</h3>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -686,55 +724,16 @@ func SectionSystem(last *repositories.TabletReport) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"space-y-3 mt-4\"><div><div class=\"flex justify-between text-[10px] mb-1 font-bold opacity-60\"><span>RAM (")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "<div class=\"space-y-3 mt-4\"><div><div class=\"flex justify-between text-[10px] mb-1 font-bold opacity-60\"><span>RAM (")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var26 string
 		templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.0f", float64(last.MemoryTotal)/1024))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 284, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 293, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, " GB)</span> <span>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(last.MemoryUsedPct))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 285, Col: 58}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "%</span></div><progress class=\"progress progress-primary h-1.5\" value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var28 string
-		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(last.MemoryUsedPct))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 287, Col: 108}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 46, "\" max=\"100\"></progress></div><div><div class=\"flex justify-between text-[10px] mb-1 font-bold opacity-60\"><span>STORAGE (")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var29 string
-		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.0f", float64(last.StorageTotal)/1024))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 291, Col: 93}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -742,29 +741,68 @@ func SectionSystem(last *repositories.TabletReport) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		var templ_7745c5c3_Var27 string
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(last.MemoryUsedPct))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 294, Col: 58}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "%</span></div><progress class=\"progress progress-primary h-1.5\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var28 string
+		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(last.MemoryUsedPct))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 296, Col: 108}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" max=\"100\"></progress></div><div><div class=\"flex justify-between text-[10px] mb-1 font-bold opacity-60\"><span>STORAGE (")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var29 string
+		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.0f", float64(last.StorageTotal)/1024))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 300, Col: 93}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, " GB)</span> <span>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		var templ_7745c5c3_Var30 string
 		templ_7745c5c3_Var30, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(last.StorageUsedPct))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 292, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 301, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var30))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "%</span></div><progress class=\"progress progress-secondary h-1.5\" value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "%</span></div><progress class=\"progress progress-secondary h-1.5\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var31 string
 		templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(last.StorageUsedPct))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 294, Col: 111}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 303, Col: 111}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\" max=\"100\"></progress></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "\" max=\"100\"></progress></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -793,7 +831,7 @@ func SectionSensors(last *repositories.TabletReport) templ.Component {
 			templ_7745c5c3_Var32 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">Hardware Sensors</h3><div class=\"grid grid-cols-2 gap-3 mb-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "<div class=\"card bg-base-100 border border-base-200 shadow-sm\"><div class=\"card-body p-5\"><h3 class=\"text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4\">Hardware Sensors</h3><div class=\"grid grid-cols-2 gap-3 mb-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -812,46 +850,46 @@ func SectionSensors(last *repositories.TabletReport) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</div><div class=\"bg-base-200/30 rounded-lg p-3\"><p class=\"text-[10px] uppercase opacity-50 mb-2 font-bold\">Accelerometer (m/s²)</p><div class=\"grid grid-cols-3 gap-2\"><div class=\"text-center\"><span class=\"block text-[9px] opacity-40\">X</span> <span class=\"text-xs font-mono font-bold\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</div><div class=\"bg-base-200/30 rounded-lg p-3\"><p class=\"text-[10px] uppercase opacity-50 mb-2 font-bold\">Accelerometer (m/s²)</p><div class=\"grid grid-cols-3 gap-2\"><div class=\"text-center\"><span class=\"block text-[9px] opacity-40\">X</span> <span class=\"text-xs font-mono font-bold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var33 string
 		templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", last.AccelX))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 318, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 327, Col: 100}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</span></div><div class=\"text-center border-x border-base-300\"><span class=\"block text-[9px] opacity-40\">Y</span> <span class=\"text-xs font-mono font-bold\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "</span></div><div class=\"text-center border-x border-base-300\"><span class=\"block text-[9px] opacity-40\">Y</span> <span class=\"text-xs font-mono font-bold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var34 string
 		templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", last.AccelY))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 322, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 331, Col: 100}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 53, "</span></div><div class=\"text-center\"><span class=\"block text-[9px] opacity-40\">Z</span> <span class=\"text-xs font-mono font-bold\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "</span></div><div class=\"text-center\"><span class=\"block text-[9px] opacity-40\">Z</span> <span class=\"text-xs font-mono font-bold\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var35 string
 		templ_7745c5c3_Var35, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%.2f", last.AccelZ))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 326, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 335, Col: 100}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var35))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 54, "</span></div></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</span></div></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -880,7 +918,7 @@ func chartScript() templ.Component {
 			templ_7745c5c3_Var36 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<script>\n        (function() {\n            const init = () => {\n                const dataElement = document.getElementById('historyChart1');\n                if (!dataElement || !dataElement.dataset.history) return;\n                const rawHistory = JSON.parse(dataElement.dataset.history);\n                const filteredData = { labels: [], battery: [], wifi: [], mem: [], storage: [] };\n                const statusData = rawHistory.success || rawHistory.Success || new Array(rawHistory.labels.length).fill(true);\n                const connectionData = { labels: rawHistory.labels || [], status: statusData.map(s => (s === true || s === 1) ? 1 : 0) };\n\n                if (rawHistory.labels) {\n                    rawHistory.labels.forEach((label, index) => {\n                        const isSuccess = statusData[index];\n                        if (isSuccess === true || isSuccess === 1) {\n                            filteredData.labels.push(label);\n                            filteredData.battery.push(rawHistory.battery[index]);\n                            filteredData.wifi.push(rawHistory.wifi[index]);\n                            filteredData.mem.push(rawHistory.mem[index]);\n                            filteredData.storage.push(rawHistory.storage[index]);\n                        }\n                    });\n                }\n\n                const setupChart = (canvasId, selectorId, defaultMetric) => {\n                    const canvas = document.getElementById(canvasId);\n                    const selector = document.getElementById(selectorId);\n                    if (!canvas) return;\n                    let currentChart;\n                    const render = (metric) => {\n                        if (currentChart) currentChart.destroy();\n                        let dataPoints = [], label = \"\", color = \"#570df8\", activeLabels = filteredData.labels;\n                        switch(metric) {\n                            case 'battery': dataPoints = filteredData.battery; label = \"Battery %\"; color = \"#10b981\"; break;\n                            case 'wifi': dataPoints = filteredData.wifi; label = \"WiFi (dBm)\"; color = \"#3b82f6\"; break;\n                            case 'mem': dataPoints = filteredData.mem; label = \"RAM %\"; color = \"#f59e0b\"; break;\n                            case 'storage': dataPoints = filteredData.storage; label = \"Storage %\"; color = \"#ef4444\"; break;\n                            case 'connection': dataPoints = connectionData.status; label = \"Connection Status\"; color = \"#6366f1\"; activeLabels = connectionData.labels; break;\n                        }\n                        currentChart = new Chart(canvas, {\n                            type: 'line',\n                            data: {\n                                labels: activeLabels,\n                                datasets: [{ label: label, data: dataPoints, borderColor: color, backgroundColor: color + \"20\", fill: true, tension: metric === 'connection' ? 0 : 0.4, stepped: metric === 'connection', pointRadius: metric === 'connection' ? 0 : 2 }]\n                            },\n                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { reverse: metric == 'wifi', beginAtZero: metric !== 'wifi', max: metric === 'connection' ? 1 : undefined, ticks: metric === 'connection' ? { stepSize: 1, callback: (v) => v === 1 ? 'Online' : 'Offline' } : {} } } }\n                        });\n                    };\n                    if(selector) selector.addEventListener('change', (e) => render(e.target.value));\n                    render(defaultMetric);\n                };\n                setupChart('historyChart1', 'chartSelector1', 'battery');\n                setupChart('historyChart2', 'chartSelector2', 'wifi');\n            };\n            if (window.Chart) init();\n            else window.addEventListener('load', init);\n        })();\n    </script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<script>\n        (function() {\n            const init = () => {\n                const dataElement = document.getElementById('historyChart1');\n                if (!dataElement || !dataElement.dataset.history) return;\n                const rawHistory = JSON.parse(dataElement.dataset.history);\n                const filteredData = { labels: [], battery: [], wifi: [], mem: [], storage: [] };\n                const statusData = rawHistory.success || rawHistory.Success || new Array(rawHistory.labels.length).fill(true);\n                const connectionData = { labels: rawHistory.labels || [], status: statusData.map(s => (s === true || s === 1) ? 1 : 0) };\n\n                if (rawHistory.labels) {\n                    rawHistory.labels.forEach((label, index) => {\n                        const isSuccess = statusData[index];\n                        if (isSuccess === true || isSuccess === 1) {\n                            filteredData.labels.push(label);\n                            filteredData.battery.push(rawHistory.battery[index]);\n                            filteredData.wifi.push(rawHistory.wifi[index]);\n                            filteredData.mem.push(rawHistory.mem[index]);\n                            filteredData.storage.push(rawHistory.storage[index]);\n                        }\n                    });\n                }\n\n                const setupChart = (canvasId, selectorId, defaultMetric) => {\n                    const canvas = document.getElementById(canvasId);\n                    const selector = document.getElementById(selectorId);\n                    if (!canvas) return;\n                    let currentChart;\n                    const render = (metric) => {\n                        if (currentChart) currentChart.destroy();\n                        let dataPoints = [], label = \"\", color = \"#570df8\", activeLabels = filteredData.labels;\n                        switch(metric) {\n                            case 'battery': dataPoints = filteredData.battery; label = \"Battery %\"; color = \"#10b981\"; break;\n                            case 'wifi': dataPoints = filteredData.wifi; label = \"WiFi (dBm)\"; color = \"#3b82f6\"; break;\n                            case 'mem': dataPoints = filteredData.mem; label = \"RAM %\"; color = \"#f59e0b\"; break;\n                            case 'storage': dataPoints = filteredData.storage; label = \"Storage %\"; color = \"#ef4444\"; break;\n                            case 'connection': dataPoints = connectionData.status; label = \"Connection Status\"; color = \"#6366f1\"; activeLabels = connectionData.labels; break;\n                        }\n                        currentChart = new Chart(canvas, {\n                            type: 'line',\n                            data: {\n                                labels: activeLabels,\n                                datasets: [{ label: label, data: dataPoints, borderColor: color, backgroundColor: color + \"20\", fill: true, tension: metric === 'connection' ? 0 : 0.4, stepped: metric === 'connection', pointRadius: metric === 'connection' ? 0 : 2 }]\n                            },\n                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { reverse: metric == 'wifi', beginAtZero: metric !== 'wifi', max: metric === 'connection' ? 1 : undefined, ticks: metric === 'connection' ? { stepSize: 1, callback: (v) => v === 1 ? 'Online' : 'Offline' } : {} } } }\n                        });\n                    };\n                    if(selector) selector.addEventListener('change', (e) => render(e.target.value));\n                    render(defaultMetric);\n                };\n                setupChart('historyChart1', 'chartSelector1', 'battery');\n                setupChart('historyChart2', 'chartSelector2', 'wifi');\n            };\n            if (window.Chart) init();\n            else window.addEventListener('load', init);\n        })();\n    </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -909,33 +947,33 @@ func infoBox(label string, value string) templ.Component {
 			templ_7745c5c3_Var37 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "<div class=\"bg-slate-50 p-3 rounded-xl border border-slate-100\"><p class=\"text-[10px] opacity-50 uppercase font-black leading-none mb-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<div class=\"bg-slate-50 p-3 rounded-xl border border-slate-100\"><p class=\"text-[10px] opacity-50 uppercase font-black leading-none mb-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var38 string
 		templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 396, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 405, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "</p><p class=\"font-bold text-slate-800 text-sm truncate\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</p><p class=\"font-bold text-slate-800 text-sm truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 397, Col: 68}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 406, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -964,33 +1002,33 @@ func detailRow(label string, value string) templ.Component {
 			templ_7745c5c3_Var40 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 59, "<div class=\"flex justify-between items-center border-b border-base-100 py-2 last:border-0\"><span class=\"text-xs opacity-60 font-semibold uppercase\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<div class=\"flex justify-between items-center border-b border-base-100 py-2 last:border-0\"><span class=\"text-xs opacity-60 font-semibold uppercase\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var41 string
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 403, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 412, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</span> <span class=\"text-sm font-bold text-slate-700\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "</span> <span class=\"text-sm font-bold text-slate-700\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var42 string
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 404, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 413, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1019,46 +1057,46 @@ func GroupBadge(g repositories.Group) templ.Component {
 			templ_7745c5c3_Var43 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "<span class=\"badge badge-sm font-bold text-white border-none cursor-help\" style=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "<span class=\"badge badge-sm font-bold text-white border-none cursor-help\" style=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var44 string
 		templ_7745c5c3_Var44, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues(fmt.Sprintf("background-color: %s;", g.Color))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 411, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 420, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var44))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 63, "\" title=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "\" title=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var45 string
 		templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(g.Description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 412, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 421, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 64, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var46 string
 		templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(g.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 414, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 423, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 65, "</span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "</span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1087,66 +1125,171 @@ func TabletGroupsModal(tabletID int64, allGroups []repositories.Group, selected 
 			templ_7745c5c3_Var47 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 66, "<dialog id=\"selection_modal\" class=\"modal modal-open\"><div class=\"modal-box max-w-sm\"><h3 class=\"font-bold text-lg mb-4\">Assign to Groups</h3><div class=\"space-y-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "<dialog id=\"selection_modal\" class=\"modal modal-open\"><div class=\"modal-box max-w-sm\"><h3 class=\"font-bold text-lg mb-4\">Assign to Groups</h3><div class=\"space-y-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, g := range allGroups {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<div class=\"flex items-center justify-between p-2 border rounded-lg\"><div class=\"flex items-center gap-2\"><div class=\"w-3 h-3 rounded-full\" style=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, "<div class=\"flex items-center justify-between p-2 border rounded-lg\"><div class=\"flex items-center gap-2\"><div class=\"w-3 h-3 rounded-full\" style=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var48 string
 			templ_7745c5c3_Var48, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("background-color:" + g.Color)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 426, Col: 99}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 435, Col: 99}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var48))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "\"></div><span class=\"text-sm font-medium\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, "\"></div><span class=\"text-sm font-medium\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var49 string
 			templ_7745c5c3_Var49, templ_7745c5c3_Err = templ.JoinStringErrs(g.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 427, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 436, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var49))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 69, "</span></div><input type=\"checkbox\" class=\"checkbox checkbox-primary checkbox-sm\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</span></div><input type=\"checkbox\" class=\"checkbox checkbox-primary checkbox-sm\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if selected[g.ID] {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 70, " checked")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, " checked")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 71, " hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 74, " hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var50 string
 			templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/groups/%d/toggle", tabletID, g.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 433, Col: 97}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 442, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "\" hx-swap=\"none\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\" hx-swap=\"none\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 73, "</div><div class=\"modal-action\"><button class=\"btn\" onclick=\"this.closest('dialog').remove()\">Done</button></div></div></dialog>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "</div><div class=\"modal-action\"><button class=\"btn\" onclick=\"this.closest('dialog').remove()\">Done</button></div></div></dialog>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func ActionButton(label string, icon templ.Component, action string, method string, variant ButtonVariant) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var51 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var51 == nil {
+			templ_7745c5c3_Var51 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		var templ_7745c5c3_Var52 = []any{"btn btn-sm gap-2 transition-all",
+			boolToText(variant == BtnNormal, "btn-ghost text-info hover:bg-info/10", ""),
+			boolToText(variant == BtnWarning, "btn-ghost text-warning hover:bg-warning/10", ""),
+			boolToText(variant == BtnDanger, "btn-outline text-error hover:bg-error hover:text-white", ""),
+			boolToText(variant == BtnPrimary, "btn-primary", ""),
+		}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var52...)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 77, "<button hx-target=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var53 string
+		templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(boolToText(method == "GET", "#modal-container", ""))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 459, Col: 71}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ.RenderAttributes(ctx, templ_7745c5c3_Buffer, templ.Attributes{"hx-" + method: action})
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 79, " hx-swap=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var54 string
+		templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(boolToText(method == "GET", "innerHTML", "none"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 461, Col: 66}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\" class=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var55 string
+		templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var52).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if icon != nil {
+			templ_7745c5c3_Err = icon.Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		var templ_7745c5c3_Var56 string
+		templ_7745c5c3_Var56, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 473, Col: 15}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var56))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "</button>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1162,6 +1305,148 @@ func getSignalColor(level int) string {
 		return "text-warning"
 	}
 	return "text-error"
+}
+
+func IconReload() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var57 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var57 == nil {
+			templ_7745c5c3_Var57 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15\"></path></svg>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func IconBeep() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var58 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var58 == nil {
+			templ_7745c5c3_Var58 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z\"></path></svg>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func IconCamera() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var59 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var59 == nil {
+			templ_7745c5c3_Var59 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 85, "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15 13a3 3 0 11-6 0 3 3 0 016 0z\"></path></svg>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func NavigateModal(tabletID int64, currentURL string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var60 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var60 == nil {
+			templ_7745c5c3_Var60 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "<dialog id=\"nav_modal\" class=\"modal modal-open\"><div class=\"modal-box border border-slate-200 shadow-2xl\"><h3 class=\"font-bold text-lg mb-4\">Update WebView URL</h3><form hx-post=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var61 string
+		templ_7745c5c3_Var61, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/navigate", tabletID))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 507, Col: 81}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var61))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\" hx-swap=\"none\" onsubmit=\"nav_modal.close()\"><div class=\"form-control\"><label class=\"label\"><span class=\"label-text font-semibold\">Target URL</span></label> <input type=\"url\" name=\"url\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var62 string
+		templ_7745c5c3_Var62, templ_7745c5c3_Err = templ.JoinStringErrs(currentURL)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 515, Col: 42}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var62))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "\" placeholder=\"https://...\" class=\"input input-bordered w-full focus:input-primary\" required autofocus></div><div class=\"modal-action\"><button type=\"button\" class=\"btn btn-ghost\" onclick=\"const m = this.closest('dialog'); m.remove()\">Cancel</button> <button type=\"submit\" class=\"btn btn-primary\" onclick=\"const m = this.closest('dialog'); setTimeout(() => m.remove(), 100)\">Update</button></div></form></div><form method=\"dialog\" class=\"modal-backdrop\"><button onclick=\"const m = this.closest('dialog'); m.remove()\">close</button></form></dialog>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
 }
 
 var _ = templruntime.GeneratedTemplate
