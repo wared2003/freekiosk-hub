@@ -54,7 +54,7 @@ func Dashboard(tablets []models.TabletDisplay, fullPage bool) templ.Component {
 				}
 				return nil
 			})
-			templ_7745c5c3_Err = Layout("Tableau de bord").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = Layout("Dashboard").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -68,7 +68,6 @@ func Dashboard(tablets []models.TabletDisplay, fullPage bool) templ.Component {
 	})
 }
 
-// Le coeur de la page
 func DashboardContent(tablets []models.TabletDisplay) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -90,20 +89,20 @@ func DashboardContent(tablets []models.TabletDisplay) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"px-6\" id=\"dashboard-container\"><header class=\"mb-8\"><h1 class=\"text-3xl font-bold tracking-tight text-slate-800\">Parc Tablettes</h1><p class=\"text-slate-500 text-sm\">Aperçu en direct des ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"px-6\" id=\"dashboard-container\" hx-ext=\"sse\" sse-connect=\"/sse/global\"><header class=\"mb-8 flex justify-between items-end\"><div><h1 class=\"text-3xl font-bold tracking-tight text-slate-800\">Devices Fleet</h1><p class=\"text-slate-500 text-sm\">Live overview of ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(len(tablets)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 24, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 24, Col: 93}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " unités.</p></header><div class=\"grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " units.</p></div><div class=\"flex items-center gap-2 text-[10px] font-bold text-success opacity-70 mb-1\"><span class=\"relative flex h-2 w-2\"><span class=\"animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75\"></span> <span class=\"relative inline-flex rounded-full h-2 w-2 bg-success\"></span></span> LIVE</div></header><div id=\"tablet-grid\" hx-get=\"/\" hx-trigger=\"sse:update\" hx-target=\"#tablet-grid\" hx-select=\"#tablet-grid\" hx-swap=\"innerHTML\" class=\"grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -121,7 +120,6 @@ func DashboardContent(tablets []models.TabletDisplay) templ.Component {
 	})
 }
 
-// La carte isolée pour plus de clarté
 func TabletCard(td models.TabletDisplay) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -143,7 +141,7 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var6 = []any{"card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all active:scale-95 cursor-pointer " + getOpacity(td)}
+		var templ_7745c5c3_Var6 = []any{"card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all active:scale-95 cursor-pointer "}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -155,13 +153,13 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(string(templ.URL(fmt.Sprintf("/tablets/%d", td.ID))))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 38, Col: 69}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 53, Col: 69}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"main\" hx-push-url=\"true\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"#main-container\" hx-push-url=\"true\" hx-select=\"unset\" hx-swap=\"innerHTML\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -181,7 +179,7 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(td.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 46, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 63, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -194,7 +192,7 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(td.IP)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 47, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 64, Col: 71}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -212,8 +210,8 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if td.LastReport != nil && td.LastReport.Success {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"mt-3\"><div class=\"flex justify-between text-[11px] mb-1 font-medium\"><span>Batterie</span> ")
+		if td.Online {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div class=\"mt-3\"><div class=\"flex justify-between text-[11px] mb-1 font-medium\"><span>Battery</span> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -242,7 +240,7 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(td.LastReport.BatteryLevel))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 56, Col: 128}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 73, Col: 128}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
@@ -277,7 +275,7 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprint(td.LastReport.BatteryLevel))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 60, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 77, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -290,7 +288,7 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(formatTime(td.LastReport.Timestamp))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 68, Col: 57}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 85, Col: 57}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -301,24 +299,30 @@ func TabletCard(td models.TabletDisplay) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"mt-4 py-3 text-center bg-slate-50 rounded text-[10px] font-bold uppercase tracking-widest text-slate-400\">Offline</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"mt-4 py-3 text-center bg-slate-50 rounded text-[10px] font-bold uppercase tracking-widest text-slate-400\">Offline, last seen ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var18 string
+			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(formatTime(td.LastSeen))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/dashboard.templ`, Line: 89, Col: 64}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
-}
-
-func getOpacity(td models.TabletDisplay) string {
-	if td.LastReport != nil && td.LastReport.Success {
-		return "opacity-100"
-	}
-	return "opacity-60 grayscale-[0.3]"
 }
 
 func getBatteryClass(level int) string {
@@ -361,18 +365,18 @@ func StatusBadge(td models.TabletDisplay) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var18 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var18 == nil {
-			templ_7745c5c3_Var18 = templ.NopComponent
+		templ_7745c5c3_Var19 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var19 == nil {
+			templ_7745c5c3_Var19 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		if td.LastReport != nil && td.LastReport.Success {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<div class=\"badge badge-success badge-xs\"></div>")
+		if td.Online {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"badge badge-success badge-xs\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<div class=\"badge badge-error badge-xs animate-pulse\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"badge badge-error badge-xs animate-pulse\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -82,7 +82,7 @@ type TabletReport struct {
 type ReportRepository interface {
 	InitTable() error
 	Add(r *TabletReport) error
-	GetLatestByTablet(tabletID int64) (*TabletReport, error)
+	GetLatestByTablet(tabletID int64, onlySuccess bool) (*TabletReport, error)
 	GetHistory(tabletID int64, limit int) ([]TabletReport, error)
 	Cleanup(days int) error
 }
@@ -155,10 +155,20 @@ func (r *sqliteReportRepo) Add(report *TabletReport) error {
 	return err
 }
 
-func (r *sqliteReportRepo) GetLatestByTablet(tabletID int64) (*TabletReport, error) {
+func (r *sqliteReportRepo) GetLatestByTablet(tabletID int64, onlySuccess bool) (*TabletReport, error) {
 	var rep TabletReport
-	err := r.db.Get(&rep, "SELECT * FROM reports WHERE tablet_id = ? ORDER BY timestamp DESC LIMIT 1", tabletID)
-	return &rep, err
+
+	query := "SELECT * FROM reports WHERE tablet_id = ?"
+	if onlySuccess {
+		query += " AND success = 1"
+	}
+	query += " ORDER BY timestamp DESC LIMIT 1"
+
+	err := r.db.Get(&rep, query, tabletID)
+	if err != nil {
+		return nil, err
+	}
+	return &rep, nil
 }
 
 func (r *sqliteReportRepo) GetHistory(tabletID int64, limit int) ([]TabletReport, error) {

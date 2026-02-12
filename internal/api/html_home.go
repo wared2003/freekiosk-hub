@@ -27,7 +27,7 @@ func (h *HtmlHomeHandler) HandleIndex(c echo.Context) error {
 
 	var displayList []models.TabletDisplay
 	for _, t := range tablets {
-		report, _ := h.reportRepo.GetLatestByTablet(int64(t.ID))
+		report, _ := h.reportRepo.GetLatestByTablet(int64(t.ID), true)
 		displayList = append(displayList, models.TabletDisplay{
 			Tablet:     t,
 			LastReport: report,

@@ -31,11 +31,18 @@ func (h *HtmlTabletHandler) HandleDetails(c echo.Context) error {
 		return c.String(http.StatusNotFound, "Tablette non trouvée")
 	}
 
-	lastReport, _ := h.reportRepo.GetLatestByTablet(id)
+	lastReport, _ := h.reportRepo.GetLatestByTablet(id, true)
 
 	history, _ := h.reportRepo.GetHistory(id, 30)
 
-	isFullPage := c.Request().Header.Get("HX-Request") != "true"
+	if c.Request().Header.Get("HX-Request") != "true" {
+		return c.Render(http.StatusOK, "", ui.TabletDetails(tablet, lastReport, history, true))
+	}
 
-	return c.Render(http.StatusOK, "", ui.TabletDetails(tablet, lastReport, history, isFullPage))
+	// 2. Si c'est un refresh auto du SSE (on ajoute ?refresh=true dans le hx-get du template)
+	if c.QueryParam("refresh") == "true" {
+		return c.Render(http.StatusOK, "", ui.TabletUIInner(tablet, lastReport, history))
+	}
+
+	return c.Render(http.StatusOK, "", ui.TabletDetails(tablet, lastReport, history, false))
 }

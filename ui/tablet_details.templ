@@ -1,199 +1,214 @@
 package ui
 
 import (
-	"freekiosk-hub/internal/repositories"
-	"fmt"
-	"encoding/json"
+    "freekiosk-hub/internal/repositories"
+    "fmt"
+    "encoding/json"
 )
 
+// --- Fonctions utilitaires inchangées ---
+
 func boolToText(cond bool, yes, no string) string {
-	if cond { return yes }
-	return no
+    if cond { return yes }
+    return no
 }
 
-func getStatusColor(last *repositories.TabletReport) string {
-	if last != nil && last.Success {
-		return "bg-success"
-	}
-	return "bg-error animate-pulse"
+func getStatusColor(status bool) string {
+    if status {
+        return "bg-success"
+    }
+    return "bg-error animate-pulse"
 }
 
 func getFullHistoryJSON(history []repositories.TabletReport) (string, string) {
-	type Series struct {
-		Labels  []string `json:"labels"`
-		Battery []int    `json:"battery"`
-		Wifi    []int    `json:"wifi"`
-		Mem     []int    `json:"mem"`
-		Storage []int    `json:"storage"`
-	}
-	s := Series{Labels: []string{}, Battery: []int{}, Wifi: []int{}, Mem: []int{}, Storage: []int{}}
-	for i := len(history) - 1; i >= 0; i-- {
-		h := history[i]
-		s.Labels = append(s.Labels, h.Timestamp.Format("15:04"))
-		s.Battery = append(s.Battery, h.BatteryLevel)
-		s.Wifi = append(s.Wifi, h.WifiSignalStrength)
-		s.Mem = append(s.Mem, h.MemoryUsedPct)
-		s.Storage = append(s.Storage, h.StorageUsedPct)
-	}
-	dataJSON, _ := json.Marshal(s)
-	var rawJSON string
-	if len(history) > 0 {
-		raw, _ := json.MarshalIndent(history[0], "", "  ")
-		rawJSON = string(raw)
-	} else {
-		rawJSON = "{}"
-	}
-	return string(dataJSON), rawJSON
+    type Series struct {
+        Labels  []string `json:"labels"`
+        Battery []int    `json:"battery"`
+        Wifi    []int    `json:"wifi"`
+        Mem     []int    `json:"mem"`
+        Storage []int    `json:"storage"`
+    }
+    s := Series{Labels: []string{}, Battery: []int{}, Wifi: []int{}, Mem: []int{}, Storage: []int{}}
+    for i := len(history) - 1; i >= 0; i-- {
+        h := history[i]
+        s.Labels = append(s.Labels, h.Timestamp.Format("15:04"))
+        s.Battery = append(s.Battery, h.BatteryLevel)
+        s.Wifi = append(s.Wifi, h.WifiSignalStrength)
+        s.Mem = append(s.Mem, h.MemoryUsedPct)
+        s.Storage = append(s.Storage, h.StorageUsedPct)
+    }
+    dataJSON, _ := json.Marshal(s)
+    var rawJSON string
+    if len(history) > 0 {
+        raw, _ := json.MarshalIndent(history[0], "", "  ")
+        rawJSON = string(raw)
+    } else {
+        rawJSON = "{}"
+    }
+    return string(dataJSON), rawJSON
 }
 
+// --- Logique des Templates ---
+
 templ TabletDetails(t *repositories.Tablet, last *repositories.TabletReport, history []repositories.TabletReport, fullPage bool) {
-	if fullPage {
-		@Layout(fmt.Sprintf("Détails %s", t.Name)) {
-			@TabletDetailsContent(t, last, history)
-		}
-	} else {
-		@TabletDetailsContent(t, last, history)
-	}
+    if fullPage {
+        @Layout(fmt.Sprintf("Détails %s", t.Name)) {
+            @TabletDetailsContent(t, last, history)
+        }
+    } else {
+        @TabletDetailsContent(t, last, history)
+    }
 }
 
 templ TabletDetailsContent(t *repositories.Tablet, last *repositories.TabletReport, history []repositories.TabletReport) {
-	{{ historyData, rawJSON := getFullHistoryJSON(history) }}
-	
-	{{
-		deviceIP := "N/A"
-		if last != nil {
-			deviceIP = last.DeviceIP
-		}
-	}}
-
-	<div class="px-6 pb-12 space-y-6" id="details-container">
-		<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-base-100 p-6 rounded-2xl shadow-sm border border-base-200 gap-4">
-			<div class="flex items-center gap-4">
-				<div class={ "w-4 h-4 rounded-full shadow-inner ", getStatusColor(last) }></div>
-				<div>
-					<h1 class="text-3xl font-black tracking-tight text-slate-800">{ t.Name }</h1>
-					<p class="text-xs font-mono opacity-50">Hub: { t.IP } | Local: { deviceIP }</p>
-				</div>
-			</div>
-			<div class="flex gap-2">
-				<button class="btn btn-sm btn-primary">📸 Capture</button>
-				<button class="btn btn-sm btn-outline text-error hover:bg-error">🔄 Reboot</button>
-			</div>
-		</div>
-
-		<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-12 gap-6">
-			
-			if last != nil {
-				<div class="xl:col-span-3 space-y-6">
-					@SectionDisplay(last)
-					@SectionWebview(last)
-				</div>
-
-				<div class="xl:col-span-3 space-y-6">
-					@SectionNetwork(last)
-					@SectionSystem(last)
-					@SectionSensors(last)
-				</div>
-
-				<div class="xl:col-span-6 space-y-6">
-					<div class="card bg-base-100 border border-base-200 shadow-sm">
-						<div class="card-body p-6">
-							<div class="flex justify-between items-center mb-4">
-								<h3 class="font-bold text-slate-800">Historique Principal</h3>
-								<select id="chartSelector1" class="select select-bordered select-sm">
-									<option value="battery">🔋 Batterie %</option>
-									<option value="wifi">📶 WiFi (dBm)</option>
-									<option value="mem">🧠 RAM %</option>
-									<option value="storage">💾 Stockage %</option>
-									<option value="connection">🟢 Status</option>
-
-								</select>
-							</div>
-							<div class="h-[250px]">
-								<canvas id="historyChart1" data-history={ historyData }></canvas>
-							</div>
-						</div>
-					</div>
-
-					<div class="card bg-base-100 border border-base-200 shadow-sm">
-						<div class="card-body p-6">
-							<div class="flex justify-between items-center mb-4">
-								<h3 class="font-bold text-slate-800">Historique Secondaire</h3>
-								<select id="chartSelector2" class="select select-bordered select-sm">
-									<option value="connection">🟢 Status</option>
-									<option value="wifi">📶 WiFi (dBm)</option>
-									<option value="battery">🔋 Batterie %</option>
-									<option value="mem">🧠 RAM %</option>
-									<option value="storage">💾 Stockage %</option>
-
-								</select>
-							</div>
-							<div class="h-[250px]">
-								<canvas id="historyChart2" data-history={ historyData }></canvas>
-							</div>
-						</div>
-					</div>
-
-					<div class="collapse collapse-arrow bg-neutral text-neutral-content shadow-xl overflow-hidden">
-						<input type="checkbox"/>
-						<div class="collapse-title text-sm font-bold opacity-80">📦 Rapport JSON brut</div>
-						<div class="collapse-content">
-							<pre id="rawJson" class="text-[11px] font-mono bg-black/40 p-4 rounded-xl overflow-x-auto max-h-[300px]">{ rawJSON }</pre>
-						</div>
-					</div>
-				</div>
-			} else {
-				<div class="lg:col-span-12 alert alert-warning">Waiting for device connection...</div>
-			}
-		</div>
-	</div>
-	@chartScript()
+    <div hx-ext="sse" sse-connect={ fmt.Sprintf("/sse/tablet/%d", t.ID) }>
+        <div 
+            id="details-container"
+            hx-get={ fmt.Sprintf("/tablets/%d?refresh=true", t.ID) } 
+            hx-trigger="sse:update"
+            hx-target="this" 
+            hx-swap="innerHTML"
+            class="px-6 pb-12 space-y-6"
+        >
+            @TabletUIInner(t, last, history)
+        </div>
+    </div>
 }
 
-templ SectionDisplay(last *repositories.TabletReport) {
-	<div class="card bg-base-100 border border-base-200 shadow-sm">
-		<div class="card-body p-5">
-			<h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">screen & audio</h3>
-			<div class="grid grid-cols-2 gap-3 mb-4">
-				@infoBox("Status", boolToText(last.ScreenOn, "On", "Off"))
-				@infoBox("Brightness", fmt.Sprintf("%d%%", (last.ScreenBrightness * 100) / 255))
-				@infoBox("Screensaver", boolToText(last.ScreensaverActive, "Actif", "Non"))
-				@infoBox("Auto Bright.", boolToText(last.AutoBrightnessEnabled, "Oui", "Non"))
-			</div>
-			<div class="space-y-1">
-				@detailRow("Rotation", boolToText(last.RotationEnabled, "Auto", "Fixe"))
-				@detailRow("Volume", fmt.Sprintf("%d %%", last.AudioVolume))
+// Cette partie contient tout ton contenu métier et les graphiques
+templ TabletUIInner(t *repositories.Tablet, last *repositories.TabletReport, history []repositories.TabletReport) {
+    {{ historyData, rawJSON := getFullHistoryJSON(history) }}
+    
+    {{
+        deviceIP := "N/A"
+        if last != nil {
+            deviceIP = last.DeviceIP
+        }
+    }}
 
-			</div>
-		</div>
-	</div>
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-base-100 p-6 rounded-2xl shadow-sm border border-base-200 gap-4">
+        <div class="flex items-center gap-4">
+            <div class={ "w-4 h-4 rounded-full shadow-inner ", getStatusColor(t.Online) }></div>
+            <div>
+                <h1 class="text-3xl font-black tracking-tight text-slate-800">{ t.Name }</h1>
+                <p class="text-xs font-mono opacity-50">Hub: { t.IP } | Local: { deviceIP }</p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <button class="btn btn-sm btn-primary">📸 Capture</button>
+            <button class="btn btn-sm btn-outline text-error hover:bg-error">🔄 Reboot</button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-12 gap-6">
+        if last != nil {
+            <div class="xl:col-span-3 space-y-6">
+                @SectionDisplay(last)
+                @SectionWebview(last)
+            </div>
+
+            <div class="xl:col-span-3 space-y-6">
+                @SectionNetwork(last)
+                @SectionSystem(last)
+                @SectionSensors(last)
+            </div>
+
+            <div class="xl:col-span-6 space-y-6">
+                <div class="card bg-base-100 border border-base-200 shadow-sm">
+                    <div class="card-body p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800">Historique Principal</h3>
+                            <select id="chartSelector1" class="select select-bordered select-sm" autocomplete="off">
+                                <option value="battery">🔋 Batterie %</option>
+                                <option value="wifi">📶 WiFi (dBm)</option>
+                                <option value="mem">🧠 RAM %</option>
+                                <option value="storage">💾 Stockage %</option>
+                                <option value="connection">🟢 Status</option>
+                            </select>
+                        </div>
+                        <div class="h-[250px]">
+                            <canvas id="historyChart1" data-history={ historyData }></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-200 shadow-sm">
+                    <div class="card-body p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-800">Historique Secondaire</h3>
+                            <select id="chartSelector2" class="select select-bordered select-sm" autocomplete="off">
+                                <option value="connection">🟢 Status</option>
+                                <option value="wifi">📶 WiFi (dBm)</option>
+                                <option value="battery">🔋 Batterie %</option>
+                                <option value="mem">🧠 RAM %</option>
+                                <option value="storage">💾 Stockage %</option>
+                            </select>
+                        </div>
+                        <div class="h-[250px]">
+                            <canvas id="historyChart2" data-history={ historyData }></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collapse collapse-arrow bg-neutral text-neutral-content shadow-xl overflow-hidden">
+                    <input type="checkbox"/>
+                    <div class="collapse-title text-sm font-bold opacity-80">📦 Rapport JSON brut</div>
+                    <div class="collapse-content">
+                        <pre id="rawJson" class="text-[11px] font-mono bg-black/40 p-4 rounded-xl overflow-x-auto max-h-[300px]">{ rawJSON }</pre>
+                    </div>
+                </div>
+            </div>
+        } else {
+            <div class="lg:col-span-12 alert alert-warning">Waiting for device connection...</div>
+        }
+    </div>
+    @chartScript()
+}
+
+// --- Sections et Scripts inchangés ---
+
+templ SectionDisplay(last *repositories.TabletReport) {
+    <div class="card bg-base-100 border border-base-200 shadow-sm">
+        <div class="card-body p-5">
+            <h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">screen & audio</h3>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                @infoBox("Status", boolToText(last.ScreenOn, "On", "Off"))
+                @infoBox("Brightness", fmt.Sprintf("%d%%", (last.ScreenBrightness * 100) / 255))
+                @infoBox("Screensaver", boolToText(last.ScreensaverActive, "Actif", "Non"))
+                @infoBox("Auto Bright.", boolToText(last.AutoBrightnessEnabled, "Oui", "Non"))
+            </div>
+            <div class="space-y-1">
+                @detailRow("Rotation", boolToText(last.RotationEnabled, "Auto", "Fixe"))
+                @detailRow("Volume", fmt.Sprintf("%d %%", last.AudioVolume))
+            </div>
+        </div>
+    </div>
 }
 
 templ SectionWebview(last *repositories.TabletReport) {
-	<div class="card bg-base-100 border border-base-200 shadow-sm">
-		<div class="card-body p-5">
-			<h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">Webview </h3>
-			<div class="p-3 bg-blue-50 rounded-lg border border-blue-100 mb-3 text-xs font-mono break-all text-blue-700">
-				if last.CurrentURL != "" {
-					 { last.CurrentURL }
-				}else {
-					<span class="italic opacity-50">No URL loaded</span>
-				}
-			</div>
-			<div class="space-y-1">
-				@detailRow("Status", boolToText(last.WebviewLoading, "Loading", "Loaded"))
-				@detailRow("Kiosk Mode", boolToText(last.KioskMode, "Activé", "Désactivé"))
-				@detailRow("Can Go Back", boolToText(last.WebviewCanGoBack, "Yes", "No"))
-			</div>
-		</div>
-	</div>
+    <div class="card bg-base-100 border border-base-200 shadow-sm">
+        <div class="card-body p-5">
+            <h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">Webview </h3>
+            <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 mb-3 text-xs font-mono break-all text-blue-700">
+                if last.CurrentURL != "" {
+                     { last.CurrentURL }
+                }else {
+                    <span class="italic opacity-50">No URL loaded</span>
+                }
+            </div>
+            <div class="space-y-1">
+                @detailRow("Status", boolToText(last.WebviewLoading, "Loading", "Loaded"))
+                @detailRow("Kiosk Mode", boolToText(last.KioskMode, "Activé", "Désactivé"))
+                @detailRow("Can Go Back", boolToText(last.WebviewCanGoBack, "Yes", "No"))
+            </div>
+        </div>
+    </div>
 }
 
 templ SectionNetwork(last *repositories.TabletReport) {
     <div class="card bg-base-100 border border-base-200 shadow-sm">
         <div class="card-body p-5">
             <h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">WiFi & Network</h3>
-            
             if last.WifiConnected {
                 <div class="mb-4 p-3 bg-base-200/50 rounded-lg">
                     <p class="text-[10px] uppercase opacity-50 mb-1">Connected to</p>
@@ -201,14 +216,12 @@ templ SectionNetwork(last *repositories.TabletReport) {
                         { last.WifiSSID }
                     </p>
                 </div>
-
                 <div class="grid grid-cols-2 gap-3 mb-3">
                     <div class={ getSignalColor(last.WifiSignalLevel) }>
                         @infoBox("Signal", fmt.Sprintf("%d%%", last.WifiSignalLevel))
                     </div>
                     @infoBox("Speed", fmt.Sprintf("%d Mbps", last.WifiLinkSpeed))
                 </div>
-
                 <div class="grid grid-cols-2 gap-3 mb-4">
                     @infoBox("Raw Strength", fmt.Sprintf("%d dBm", last.WifiSignalStrength))
                     @infoBox("Frequency", fmt.Sprintf("%.2f GHz", float64(last.WifiFrequency)/1000.0))
@@ -223,46 +236,43 @@ templ SectionNetwork(last *repositories.TabletReport) {
 }
 
 templ SectionSystem(last *repositories.TabletReport) {
-	<div class="card bg-base-100 border border-base-200 shadow-sm">
-		<div class="card-body p-5">
-			<h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">Système</h3>
-			@detailRow("Hostname", last.DeviceHostname)
-			@detailRow("Device Owner", boolToText(last.IsDeviceOwner, "Oui", "Non"))
-			<div class="space-y-3 mt-4">
-				<div>
-					<div class="flex justify-between text-[10px] mb-1 font-bold opacity-60">
-					<span>RAM ({ fmt.Sprintf("%.0f", float64(last.MemoryTotal)/1024) } GB)</span>
-					<span>{ fmt.Sprint(last.MemoryUsedPct) }%</span>
-					</div>
-					<progress class="progress progress-primary h-1.5" value={ fmt.Sprint(last.MemoryUsedPct) } max="100"></progress>
-				</div>
-				<div>
-					<div class="flex justify-between text-[10px] mb-1 font-bold opacity-60">
-						<span>STORAGE ({ fmt.Sprintf("%.0f", float64(last.StorageTotal)/1024) } GB)</span>
-						<span>{ fmt.Sprint(last.StorageUsedPct) }%</span>
-					</div>
-					<progress class="progress progress-secondary h-1.5" value={ fmt.Sprint(last.StorageUsedPct) } max="100"></progress>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="card bg-base-100 border border-base-200 shadow-sm">
+        <div class="card-body p-5">
+            <h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">Système</h3>
+            @detailRow("Hostname", last.DeviceHostname)
+            @detailRow("Device Owner", boolToText(last.IsDeviceOwner, "Oui", "Non"))
+            <div class="space-y-3 mt-4">
+                <div>
+                    <div class="flex justify-between text-[10px] mb-1 font-bold opacity-60">
+                    <span>RAM ({ fmt.Sprintf("%.0f", float64(last.MemoryTotal)/1024) } GB)</span>
+                    <span>{ fmt.Sprint(last.MemoryUsedPct) }%</span>
+                    </div>
+                    <progress class="progress progress-primary h-1.5" value={ fmt.Sprint(last.MemoryUsedPct) } max="100"></progress>
+                </div>
+                <div>
+                    <div class="flex justify-between text-[10px] mb-1 font-bold opacity-60">
+                        <span>STORAGE ({ fmt.Sprintf("%.0f", float64(last.StorageTotal)/1024) } GB)</span>
+                        <span>{ fmt.Sprint(last.StorageUsedPct) }%</span>
+                    </div>
+                    <progress class="progress progress-secondary h-1.5" value={ fmt.Sprint(last.StorageUsedPct) } max="100"></progress>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 templ SectionSensors(last *repositories.TabletReport) {
     <div class="card bg-base-100 border border-base-200 shadow-sm">
         <div class="card-body p-5">
             <h3 class="text-xs font-bold uppercase tracking-widest opacity-40 text-primary mb-4">Hardware Sensors</h3>
-            
             <div class="grid grid-cols-2 gap-3 mb-4">
                 @infoBox("Light Level", fmt.Sprintf("%.0f lx", last.LightLevel))
-                
                 if last.Proximity >= 0 {
                     @infoBox("Proximity", fmt.Sprintf("%.0f cm", last.Proximity))
                 } else {
                     @infoBox("Proximity", "N/A")
                 }
             </div>
-
             <div class="bg-base-200/30 rounded-lg p-3">
                 <p class="text-[10px] uppercase opacity-50 mb-2 font-bold">Accelerometer (m/s²)</p>
                 <div class="grid grid-cols-3 gap-2">
@@ -290,28 +300,11 @@ templ chartScript() {
             const init = () => {
                 const dataElement = document.getElementById('historyChart1');
                 if (!dataElement || !dataElement.dataset.history) return;
-
                 const rawHistory = JSON.parse(dataElement.dataset.history);
-                
-                // On prépare les données filtrées (seulement les succès)
-                const filteredData = {
-                    labels: [],
-                    battery: [],
-                    wifi: [],
-                    mem: [],
-                    storage: [],
-                };
-
-                // On prépare les données de connexion
-                // Note : Si rawHistory.success n'existe pas, on considère tout comme "true" pour éviter l'écran vide
+                const filteredData = { labels: [], battery: [], wifi: [], mem: [], storage: [] };
                 const statusData = rawHistory.success || rawHistory.Success || new Array(rawHistory.labels.length).fill(true);
+                const connectionData = { labels: rawHistory.labels || [], status: statusData.map(s => (s === true || s === 1) ? 1 : 0) };
 
-                const connectionData = {
-                    labels: rawHistory.labels || [],
-                    status: statusData.map(s => (s === true || s === 1) ? 1 : 0)
-                };
-
-                // Remplissage du filtrage
                 if (rawHistory.labels) {
                     rawHistory.labels.forEach((label, index) => {
                         const isSuccess = statusData[index];
@@ -329,69 +322,32 @@ templ chartScript() {
                     const canvas = document.getElementById(canvasId);
                     const selector = document.getElementById(selectorId);
                     if (!canvas) return;
-                    
                     let currentChart;
-
                     const render = (metric) => {
                         if (currentChart) currentChart.destroy();
-                        
                         let dataPoints = [], label = "", color = "#570df8", activeLabels = filteredData.labels;
-                        
                         switch(metric) {
                             case 'battery': dataPoints = filteredData.battery; label = "Battery %"; color = "#10b981"; break;
                             case 'wifi': dataPoints = filteredData.wifi; label = "WiFi (dBm)"; color = "#3b82f6"; break;
                             case 'mem': dataPoints = filteredData.mem; label = "RAM %"; color = "#f59e0b"; break;
                             case 'storage': dataPoints = filteredData.storage; label = "Storage %"; color = "#ef4444"; break;
-                            case 'connection': 
-                                dataPoints = connectionData.status; 
-                                label = "Connection Status"; 
-                                color = "#6366f1";
-                                activeLabels = connectionData.labels;
-                                break;
+                            case 'connection': dataPoints = connectionData.status; label = "Connection Status"; color = "#6366f1"; activeLabels = connectionData.labels; break;
                         }
-
                         currentChart = new Chart(canvas, {
                             type: 'line',
                             data: {
                                 labels: activeLabels,
-                                datasets: [{
-                                    label: label,
-                                    data: dataPoints,
-                                    borderColor: color,
-                                    backgroundColor: color + "20",
-                                    fill: true,
-                                    tension: metric === 'connection' ? 0 : 0.4,
-                                    stepped: metric === 'connection',
-                                    pointRadius: metric === 'connection' ? 0 : 2
-                                }]
+                                datasets: [{ label: label, data: dataPoints, borderColor: color, backgroundColor: color + "20", fill: true, tension: metric === 'connection' ? 0 : 0.4, stepped: metric === 'connection', pointRadius: metric === 'connection' ? 0 : 2 }]
                             },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: { legend: { display: false } },
-                                scales: {
-                                    y: {
-                                        reverse: metric !== 'wifi', 
-                    					beginAtZero: metric !== 'wifi',
-                                        max: metric === 'connection' ? 1 : undefined,
-                                        ticks: metric === 'connection' ? {
-                                            stepSize: 1,
-                                            callback: (v) => v === 1 ? 'Online' : 'Offline'
-                                        } : {}
-                                    }
-                                }
-                            }
+                            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { reverse: metric == 'wifi', beginAtZero: metric !== 'wifi', max: metric === 'connection' ? 1 : undefined, ticks: metric === 'connection' ? { stepSize: 1, callback: (v) => v === 1 ? 'Online' : 'Offline' } : {} } } }
                         });
                     };
-
                     if(selector) selector.addEventListener('change', (e) => render(e.target.value));
                     render(defaultMetric);
                 };
-
                 setupChart('historyChart1', 'chartSelector1', 'battery');
                 setupChart('historyChart2', 'chartSelector2', 'wifi');
             };
-
             if (window.Chart) init();
             else window.addEventListener('load', init);
         })();
@@ -399,24 +355,21 @@ templ chartScript() {
 }
 
 templ infoBox(label string, value string) {
-	<div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-		<p class="text-[10px] opacity-50 uppercase font-black leading-none mb-2">{ label }</p>
-		<p class="font-bold text-slate-800 text-sm truncate">{ value }</p>
-	</div>
+    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <p class="text-[10px] opacity-50 uppercase font-black leading-none mb-2">{ label }</p>
+        <p class="font-bold text-slate-800 text-sm truncate">{ value }</p>
+    </div>
 }
 
 templ detailRow(label string, value string) {
-	<div class="flex justify-between items-center border-b border-base-100 py-2 last:border-0">
-		<span class="text-xs opacity-60 font-semibold uppercase">{ label }</span>
-		<span class="text-sm font-bold text-slate-700">{ value }</span>
-	</div>
+    <div class="flex justify-between items-center border-b border-base-100 py-2 last:border-0">
+        <span class="text-xs opacity-60 font-semibold uppercase">{ label }</span>
+        <span class="text-sm font-bold text-slate-700">{ value }</span>
+    </div>
 }
 
 func getSignalColor(level int) string {
-    if level >= 75 {
-        return "text-success" // Vert
-    } else if level >= 40 {
-        return "text-warning" // Orange/Jaune
-    }
-    return "text-error" // Rouge
+    if level >= 75 { return "text-success" }
+    if level >= 40 { return "text-warning" }
+    return "text-error"
 }

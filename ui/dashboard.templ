@@ -8,7 +8,7 @@ import (
 
 templ Dashboard(tablets []models.TabletDisplay, fullPage bool) {
     if fullPage {
-        @Layout("Tableau de bord") {
+        @Layout("Dashboard") {
             @DashboardContent(tablets)
         }
     } else {
@@ -16,15 +16,31 @@ templ Dashboard(tablets []models.TabletDisplay, fullPage bool) {
     }
 }
 
-// Le coeur de la page
 templ DashboardContent(tablets []models.TabletDisplay) {
-    <div class="px-6" id="dashboard-container">
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold tracking-tight text-slate-800">Parc Tablettes</h1>
-            <p class="text-slate-500 text-sm">Aperçu en direct des { fmt.Sprint(len(tablets)) } unités.</p>
+    <div class="px-6" id="dashboard-container" hx-ext="sse" sse-connect="/sse/global">
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-800">Devices Fleet</h1>
+                <p class="text-slate-500 text-sm">Live overview of { fmt.Sprint(len(tablets)) } units.</p>
+            </div>
+            <div class="flex items-center gap-2 text-[10px] font-bold text-success opacity-70 mb-1">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                </span>
+                LIVE
+            </div>
         </header>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div 
+            id="tablet-grid"
+            hx-get="/" 
+            hx-trigger="sse:update" 
+            hx-target="#tablet-grid" 
+            hx-select="#tablet-grid"
+            hx-swap="innerHTML"
+            class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+        >
             for _, td := range tablets {
                 @TabletCard(td)
             }
@@ -32,13 +48,14 @@ templ DashboardContent(tablets []models.TabletDisplay) {
     </div>
 }
 
-// La carte isolée pour plus de clarté
 templ TabletCard(td models.TabletDisplay) {
     <div 
         hx-get={ string(templ.URL(fmt.Sprintf("/tablets/%d", td.ID))) }
-        hx-target="main"
+        hx-target="#main-container"
         hx-push-url="true"
-        class={ "card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all active:scale-95 cursor-pointer " + getOpacity(td) }
+        hx-select="unset"
+        hx-swap="innerHTML"
+        class={ "card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-all active:scale-95 cursor-pointer "}
     >
         <div class="card-body p-4">
             <div class="flex justify-between items-start">
@@ -49,10 +66,10 @@ templ TabletCard(td models.TabletDisplay) {
                 @StatusBadge(td)
             </div>
             
-            if td.LastReport != nil && td.LastReport.Success {
+            if td.Online {
                 <div class="mt-3">
                     <div class="flex justify-between text-[11px] mb-1 font-medium">
-                        <span>Batterie</span>
+                        <span>Battery</span>
                         <span class={ getBatteryTextColor(td.LastReport.BatteryLevel) }>{ fmt.Sprint(td.LastReport.BatteryLevel) }%</span>
                     </div>
                     <progress 
@@ -69,18 +86,11 @@ templ TabletCard(td models.TabletDisplay) {
                 </div>
             } else {
                 <div class="mt-4 py-3 text-center bg-slate-50 rounded text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                    Offline
+                    Offline, last seen { formatTime(td.LastSeen) }
                 </div>
             }
         </div>
     </div>
-}
-
-func getOpacity(td models.TabletDisplay) string {
-    if td.LastReport != nil && td.LastReport.Success {
-        return "opacity-100"
-    }
-    return "opacity-60 grayscale-[0.3]"
 }
 
 func getBatteryClass(level int) string {
@@ -100,7 +110,7 @@ func formatTime(t time.Time) string {
 }
 
 templ StatusBadge(td models.TabletDisplay) {
-    if td.LastReport != nil && td.LastReport.Success {
+    if td.Online {
         <div class="badge badge-success badge-xs"></div>
     } else {
         <div class="badge badge-error badge-xs animate-pulse"></div>

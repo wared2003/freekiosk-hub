@@ -10,6 +10,7 @@ templ Layout(title string) {
             <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
             <script src="https://cdn.tailwindcss.com"></script>
             <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+            <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <style>
                 .glass-nav {
@@ -47,7 +48,7 @@ templ Layout(title string) {
                 </div>
             </div>
 
-            <main class="max-w-7xl mx-auto py-8">
+            <main class="max-w-7xl mx-auto py-8" id="main-container">
                 { children... }
             </main>
 

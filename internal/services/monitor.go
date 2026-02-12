@@ -9,6 +9,7 @@ import (
 
 	"freekiosk-hub/internal/clients"
 	"freekiosk-hub/internal/repositories"
+	"freekiosk-hub/internal/sse"
 )
 
 type MonitorService interface {
@@ -100,6 +101,7 @@ func (s *monitorServiceImpl) worker(wg *sync.WaitGroup, jobs <-chan repositories
 			t.Online = true
 			t.LastSeen = time.Now()
 			t.Version = report.DeviceVersion
+
 		} else {
 			t.Online = false
 			slog.Info("Tablet offline or returned error", "id", t.ID, "ip", t.IP, "error", err)
@@ -107,11 +109,14 @@ func (s *monitorServiceImpl) worker(wg *sync.WaitGroup, jobs <-chan repositories
 
 		if err := s.tabletRepo.Save(&t); err != nil {
 			slog.Error("Failed to update tablet status", "id", t.ID, "error", err)
+		} else {
+			sse.Instance.NotifyNewReport(report.TabletID)
 		}
 
 		if err := s.reportRepo.Add(report); err != nil {
 			slog.Error("Failed to save report", "id", t.ID, "error", err)
 		}
+
 	}
 }
 
