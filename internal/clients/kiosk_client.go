@@ -1,8 +1,10 @@
 package clients
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -10,18 +12,49 @@ import (
 )
 
 type KioskClient interface {
+	// Statut & Monitoring
 	FetchStatus(ip string) (*repositories.TabletReport, error)
+
+	// Affichage & UI
+	SetBrightness(ip string, value int) error
+	SetVolume(ip string, value int) error
+	SetScreen(ip string, on bool) error
+	SetScreensaver(ip string, active bool) error
+	ShowToast(ip string, text string) error
+
+	// Navigation & Webview
+	Navigate(ip string, url string) error
+	NavigateAlias(ip string, url string) error
+	Reload(ip string) error
+	ClearCache(ip string) error
+	ExecuteJS(ip string, code string) error
+	SetRotation(ip string, start bool) error
+
+	// Médias & Interaction
+	Speak(ip string, text string) error
+	PlayAudio(ip string, url string, loop bool, volume int) error
+	StopAudio(ip string) error
+	Beep(ip string) error
+
+	// Système & Apps
+	Wake(ip string) error
+	Reboot(ip string) error
+	LaunchApp(ip string, packageName string) error
+
+	// Caméra
+	TakePhoto(ip string, camera string, quality int) ([]byte, error)
+
+	// Contrôle à distance
+	SendRemoteCommand(ip string, action string) error
 }
 
 type httpClientImpl struct {
 	httpClient *http.Client
-	apiKey     string
 }
 
-func NewKioskClient(client *http.Client, apiKey string) KioskClient {
+func NewKioskClient(client *http.Client) KioskClient {
 	return &httpClientImpl{
 		httpClient: client,
-		apiKey:     apiKey,
 	}
 }
 
@@ -107,16 +140,7 @@ func (c *httpClientImpl) FetchStatus(ip string) (*repositories.TabletReport, err
 		Timestamp: time.Now(),
 	}
 
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return failReport, err
-	}
-
-	if c.apiKey != "" {
-		req.Header.Set("X-API-KEY", c.apiKey)
-	}
-
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.httpClient.Get(url)
 	if err != nil {
 		return failReport, fmt.Errorf("failed to reach kiosk at %s: %w", ip, err)
 	}
@@ -182,4 +206,188 @@ func (c *httpClientImpl) FetchStatus(ip string) (*repositories.TabletReport, err
 		LowMemory:             kr.Data.Memory.LowMemory,
 		Timestamp:             time.Now(),
 	}, nil
+}
+
+type CommandResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		Executed bool   `json:"executed"`
+		Command  string `json:"command"`
+	} `json:"data"`
+}
+
+func (c *httpClientImpl) postJSON(ip, path string, payload interface{}) error {
+	url := fmt.Sprintf("http://%s%s", ip, path)
+	data, _ := json.Marshal(payload)
+
+	resp, err := c.httpClient.Post(url, "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		return fmt.Errorf("network error: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// On décode la réponse systématiquement
+	var cr CommandResponse
+	if err := json.NewDecoder(resp.Body).Decode(&cr); err != nil {
+		return fmt.Errorf("failed to decode kiosk response: %w", err)
+	}
+
+	// C'est ici qu'on vérifie tes deux drapeaux
+	if !cr.Success {
+		return fmt.Errorf("kiosk returned success=false")
+	}
+	if !cr.Data.Executed {
+		return fmt.Errorf("kiosk failed to execute %s", cr.Data.Command)
+	}
+
+	return nil
+}
+func (c *httpClientImpl) SetBrightness(ip string, value int) error {
+	return c.postJSON(ip, "/api/brightness", map[string]int{"value": value})
+}
+
+func (c *httpClientImpl) SetVolume(ip string, value int) error {
+	return c.postJSON(ip, "/api/volume", map[string]int{"value": value})
+}
+
+func (c *httpClientImpl) Navigate(ip string, url string) error {
+	return c.postJSON(ip, "/api/url", map[string]string{"url": url})
+}
+
+func (c *httpClientImpl) Speak(ip string, text string) error {
+	return c.postJSON(ip, "/api/tts", map[string]string{"text": text})
+}
+
+func (c *httpClientImpl) ShowToast(ip string, text string) error {
+	return c.postJSON(ip, "/api/toast", map[string]string{"text": text})
+}
+
+func (c *httpClientImpl) SetScreen(ip string, on bool) error {
+	path := "/api/screen/off"
+	if on {
+		path = "/api/screen/on"
+	}
+	resp, err := c.httpClient.Post(fmt.Sprintf("http://%s%s", ip, path), "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) SetScreensaver(ip string, active bool) error {
+	path := "/api/screensaver/off"
+	if active {
+		path = "/api/screensaver/on"
+	}
+	resp, err := c.httpClient.Post(fmt.Sprintf("http://%s%s", ip, path), "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) Reload(ip string) error {
+	resp, err := c.httpClient.Post(fmt.Sprintf("http://%s/api/reload", ip), "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) Wake(ip string) error {
+	resp, err := c.httpClient.Post(fmt.Sprintf("http://%s/api/wake", ip), "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) Reboot(ip string) error {
+	resp, err := c.httpClient.Post(fmt.Sprintf("http://%s/api/reboot", ip), "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) ClearCache(ip string) error {
+	resp, err := c.httpClient.Post(fmt.Sprintf("http://%s/api/clearCache", ip), "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) LaunchApp(ip string, packageName string) error {
+	return c.postJSON(ip, "/api/app/launch", map[string]string{"package": packageName})
+}
+
+func (c *httpClientImpl) ExecuteJS(ip string, code string) error {
+	return c.postJSON(ip, "/api/js", map[string]string{"code": code})
+}
+
+func (c *httpClientImpl) TakePhoto(ip string, camera string, quality int) ([]byte, error) {
+	url := fmt.Sprintf("http://%s/api/camera/photo?camera=%s&quality=%d", ip, camera, quality)
+	resp, err := c.httpClient.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return io.ReadAll(resp.Body)
+}
+
+func (c *httpClientImpl) PlayAudio(ip string, url string, loop bool, volume int) error {
+	payload := map[string]interface{}{"url": url, "loop": loop, "volume": volume}
+	return c.postJSON(ip, "/api/audio/play", payload)
+}
+
+func (c *httpClientImpl) StopAudio(ip string) error {
+	resp, err := c.httpClient.Post(fmt.Sprintf("http://%s/api/audio/stop", ip), "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) Beep(ip string) error {
+	resp, err := c.httpClient.Post(fmt.Sprintf("http://%s/api/audio/beep", ip), "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) SendRemoteCommand(ip string, action string) error {
+	url := fmt.Sprintf("http://%s/api/remote/%s", ip, action)
+	resp, err := c.httpClient.Post(url, "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) SetRotation(ip string, start bool) error {
+	path := "/api/rotation/stop"
+	if start {
+		path = "/api/rotation/start"
+	}
+	url := fmt.Sprintf("http://%s%s", ip, path)
+	resp, err := c.httpClient.Post(url, "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
+}
+
+func (c *httpClientImpl) NavigateAlias(ip string, url string) error {
+	return c.postJSON(ip, "/api/navigate", map[string]string{"url": url})
+}
+
+func (c *httpClientImpl) WakeFromScreensaver(ip string) error {
+	url := fmt.Sprintf("http://%s/api/wake", ip)
+	resp, err := c.httpClient.Post(url, "", nil)
+	if err == nil {
+		resp.Body.Close()
+	}
+	return err
 }

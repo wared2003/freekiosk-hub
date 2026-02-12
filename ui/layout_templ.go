@@ -8,6 +8,11 @@ package ui
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import (
+	"fmt"
+	"time"
+)
+
 func Layout(title string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -36,13 +41,13 @@ func Layout(title string) templ.Component {
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 9, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 13, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " | FreeKiosk Hub</title><link href=\"https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css\" rel=\"stylesheet\" type=\"text/css\"><script src=\"https://cdn.tailwindcss.com\"></script><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><script src=\"https://unpkg.com/htmx.org/dist/ext/sse.js\"></script><script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script><style>\n                .glass-nav {\n                    background: rgba(255, 255, 255, 0.8);\n                    backdrop-filter: blur(10px);\n                    border-bottom: 1px solid rgba(0,0,0,0.1);\n                }\n            </style></head><body class=\"min-h-screen bg-slate-50 text-slate-900 font-sans\"><div class=\"sticky top-0 z-50 glass-nav\"><div class=\"navbar max-w-7xl mx-auto px-4\"><div class=\"flex-1 gap-2\"><div class=\"bg-primary text-primary-content p-2 rounded-xl shadow-lg\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z\"></path></svg></div><a hx-get=\"/\" hx-target=\"main\" hx-push-url=\"true\" class=\"text-xl font-black tracking-tighter uppercase ml-2 cursor-pointer\">FreeKiosk<span class=\"text-primary\">Hub</span></a></div><div class=\"flex-none gap-4\"><ul class=\"menu menu-horizontal px-1 font-medium gap-1\"><li><a hx-get=\"/\" hx-target=\"main\" hx-push-url=\"true\" class=\"rounded-lg hover:bg-primary/10 transition-colors cursor-pointer\">Dashboard</a></li><li><a hx-get=\"/groups\" hx-target=\"main\" hx-push-url=\"true\" class=\"rounded-lg hover:bg-primary/10 transition-colors cursor-pointer\">Groups</a></li><li><a hx-get=\"/admin/import\" hx-target=\"main\" hx-push-url=\"true\" class=\"rounded-lg hover:bg-primary/10 transition-colors cursor-pointer\">Importation</a></li></ul><div class=\"avatar placeholder\"><div class=\"bg-neutral text-neutral-content rounded-full w-8\"><span class=\"text-xs\">FK</span></div></div></div></div></div><main class=\"max-w-7xl mx-auto py-8\" id=\"main-container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " | FreeKiosk Hub</title><link href=\"https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css\" rel=\"stylesheet\" type=\"text/css\"><script src=\"https://cdn.tailwindcss.com\"></script><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script><script src=\"https://unpkg.com/htmx.org/dist/ext/sse.js\"></script><script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script><style>\n                .glass-nav {\n                    background: rgba(255, 255, 255, 0.8);\n                    backdrop-filter: blur(10px);\n                    border-bottom: 1px solid rgba(0,0,0,0.1);\n                }\n            </style></head><body class=\"min-h-screen bg-slate-50 text-slate-900 font-sans\"><div class=\"sticky top-0 z-50 glass-nav\"><div class=\"navbar max-w-7xl mx-auto px-4\"><div class=\"flex-1 gap-2\"><div class=\"bg-primary text-primary-content p-2 rounded-xl shadow-lg\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z\"></path></svg></div><a hx-get=\"/\" hx-target=\"main\" hx-push-url=\"true\" class=\"text-xl font-black tracking-tighter uppercase ml-2 cursor-pointer\">FreeKiosk<span class=\"text-primary\">Hub</span></a></div><div class=\"flex-none gap-4\"><ul class=\"menu menu-horizontal px-1 font-medium gap-1\"><li><a hx-get=\"/\" hx-target=\"main\" hx-push-url=\"true\" class=\"rounded-lg hover:bg-primary/10 transition-colors cursor-pointer\">Dashboard</a></li><li><a hx-get=\"/groups\" hx-target=\"main\" hx-push-url=\"true\" class=\"rounded-lg hover:bg-primary/10 transition-colors cursor-pointer\">Groups</a></li><li><a hx-get=\"/admin/import\" hx-target=\"main\" hx-push-url=\"true\" class=\"rounded-lg hover:bg-primary/10 transition-colors cursor-pointer\">Importation</a></li></ul><div class=\"avatar placeholder\"><div class=\"bg-neutral text-neutral-content rounded-full w-8\"><span class=\"text-xs\">FK</span></div></div></div></div></div><div id=\"toast-container\" class=\"toast toast-end fixed bottom-6 right-6 z-[9999]\"></div><main class=\"max-w-7xl mx-auto py-8\" id=\"main-container\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,7 +55,101 @@ func Layout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main><footer class=\"footer footer-center p-4 text-slate-400 text-xs\"><aside><p>FreeKiosk Hub</p></aside></footer></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main><footer class=\"footer footer-center p-4 text-slate-400 text-xs\"><aside><p>FreeKiosk Hub</p></aside></footer><style>\n                .toast-card {\n                    animation: toast-in 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;\n                    pointer-events: auto; /* On réactive les clics pour le bouton fermer */\n                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);\n                }\n\n                @keyframes toast-in {\n                    from { transform: translateY(20px); opacity: 0; scale: 0.9; }\n                    to { transform: translateY(0); opacity: 1; scale: 1; }\n                }\n\n               .toast-out {\n                    opacity: 0 !important;\n                    transform: scale(0.9) translateY(20px) !important;\n                    transition: \n                        opacity 0.3s ease-out, \n                        transform 0.4s cubic-bezier(0.4, 0, 1, 1),\n                        margin 0.4s 0.1s ease-in !important; /* Pour réduire l'espace proprement */\n                    pointer-events: none; /* Évite les clics fantômes pendant l'animation */\n                }\n            </style></body></html>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func Toast(message string, status string) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		toastID := fmt.Sprintf("t%d", time.Now().UnixNano())
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div hx-swap-oob=\"beforeend:#toast-container\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 = []any{"alert shadow-2xl flex items-center justify-between min-w-[320px] border-none !opacity-100 mb-2 pointer-events-auto",
+			boolToText(status == "success", "alert-success text-white", "alert-error text-white")}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<span id=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(toastID)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 120, Col: 20}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var4).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"><div class=\"flex items-center gap-3\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if status == "success" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 shrink-0\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 shrink-0\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg> ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<span class=\"font-bold text-sm\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(message)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/layout.templ`, Line: 131, Col: 53}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</span></div><button onclick=\"const a = this.closest('.alert'); a.style.opacity='0'; a.style.transform='scale(0.9)'; setTimeout(() => a.remove(), 100)\" class=\"btn btn-ghost btn-xs btn-circle bg-black/10 hover:bg-black/20 text-white border-none ml-4\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button><script>\n            \n                // Utilisation de l'ID injecté par Templ\n                const el = document.getElementById(\"{ toastID }\");\n                if (el) {\n                    setTimeout(() => {\n                        if(document.body.contains(el)) {\n                            el.style.opacity = '0';\n                            el.style.transform = 'scale(0.4)';\n                            setTimeout(() => el.remove(), 400);\n                        }\n                    }, 5000);\n                }\n            \n        </script></span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

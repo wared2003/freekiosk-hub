@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"freekiosk-hub/internal/clients"
+	"freekiosk-hub/internal/config"
 	"freekiosk-hub/internal/repositories"
 	"freekiosk-hub/internal/services"
 	"freekiosk-hub/internal/sse"
@@ -17,25 +19,35 @@ import (
 
 // ApiServer centralise les dépendances pour le routage
 type ApiServer struct {
-	Echo       *echo.Echo
-	DB         *sql.DB
-	TabletRepo repositories.TabletRepository
-	ReportRepo repositories.ReportRepository
-	GroupRepo  repositories.GroupRepository
-	MonitorSvc services.MonitorService
-	ApiKey     string
+	Echo        *echo.Echo
+	DB          *sql.DB
+	TabletRepo  repositories.TabletRepository
+	ReportRepo  repositories.ReportRepository
+	GroupRepo   repositories.GroupRepository
+	MonitorSvc  services.MonitorService
+	KioskClient clients.KioskClient
+	cfg         config.Config
 }
 
 // NewRouter initialise le serveur, les handlers et les routes
-func NewRouter(e *echo.Echo, db *sql.DB, tr repositories.TabletRepository, rr repositories.ReportRepository, gr repositories.GroupRepository, ms services.MonitorService, apiKey string) *ApiServer {
+func NewRouter(e *echo.Echo, db *sql.DB,
+	tr repositories.TabletRepository,
+	rr repositories.ReportRepository,
+	gr repositories.GroupRepository,
+	ms services.MonitorService,
+	ks clients.KioskClient,
+	cfg config.Config,
+
+) *ApiServer {
 	s := &ApiServer{
-		Echo:       e,
-		DB:         db,
-		TabletRepo: tr,
-		ReportRepo: rr,
-		GroupRepo:  gr,
-		MonitorSvc: ms,
-		ApiKey:     apiKey,
+		Echo:        e,
+		DB:          db,
+		TabletRepo:  tr,
+		ReportRepo:  rr,
+		GroupRepo:   gr,
+		MonitorSvc:  ms,
+		KioskClient: ks,
+		cfg:         cfg,
 	}
 
 	s.setupMiddlewares()
@@ -86,8 +98,10 @@ func (s *ApiServer) setupMiddlewares() {
 
 func (s *ApiServer) setupRoutes() {
 
+	kService := services.NewKioskService(s.TabletRepo, s.GroupRepo, s.KioskClient, s.cfg.KioskPort)
+
 	homeH := NewHtmlHomeHandler(s.TabletRepo, s.ReportRepo, s.GroupRepo)
-	tabletH := NewHtmlTabletHandler(s.TabletRepo, s.ReportRepo, s.GroupRepo)
+	tabletH := NewHtmlTabletHandler(s.TabletRepo, s.ReportRepo, s.GroupRepo, kService)
 	groupH := NewGroupHandler(s.GroupRepo)
 
 	systemJsonH := NewSystemJSONHandler(s.DB)
@@ -101,6 +115,9 @@ func (s *ApiServer) setupRoutes() {
 		tablets.GET("/:id", tabletH.HandleDetails)
 		tablets.GET("/:id/groups-selection", groupH.HandleTabletGroupsSelection)
 		tablets.POST("/:tabletID/groups/:groupID/toggle", groupH.HandleToggleGroup)
+
+		//commands
+		tablets.POST("/:id/command/beep", tabletH.HandleBeep)
 	}
 
 	groupRoutes := s.Echo.Group("/groups")

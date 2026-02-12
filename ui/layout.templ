@@ -1,4 +1,8 @@
 package ui
+import (
+	"fmt"
+	"time"
+)
 
 templ Layout(title string) {
     <!DOCTYPE html>
@@ -72,8 +76,9 @@ templ Layout(title string) {
                         </div>
                     </div>
                 </div>
-
-            <main class="max-w-7xl mx-auto py-8" id="main-container">
+                    <div id="toast-container" class="toast toast-end fixed bottom-6 right-6 z-[9999]"></div>            
+                    <main class="max-w-7xl mx-auto py-8" id="main-container">
+                
                 { children... }
             </main>
 
@@ -82,6 +87,73 @@ templ Layout(title string) {
                     <p>FreeKiosk Hub</p>
                 </aside>
             </footer>
+           <style>
+                .toast-card {
+                    animation: toast-in 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+                    pointer-events: auto; /* On réactive les clics pour le bouton fermer */
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                }
+
+                @keyframes toast-in {
+                    from { transform: translateY(20px); opacity: 0; scale: 0.9; }
+                    to { transform: translateY(0); opacity: 1; scale: 1; }
+                }
+
+               .toast-out {
+                    opacity: 0 !important;
+                    transform: scale(0.9) translateY(20px) !important;
+                    transition: 
+                        opacity 0.3s ease-out, 
+                        transform 0.4s cubic-bezier(0.4, 0, 1, 1),
+                        margin 0.4s 0.1s ease-in !important; /* Pour réduire l'espace proprement */
+                    pointer-events: none; /* Évite les clics fantômes pendant l'animation */
+                }
+            </style>
         </body>
     </html>
 }
+
+templ Toast(message string, status string) {
+    {{ toastID := fmt.Sprintf("t%d", time.Now().UnixNano()) }}
+    <div hx-swap-oob="beforeend:#toast-container">
+    <span 
+        id={ toastID }
+        
+        class={ "alert shadow-2xl flex items-center justify-between min-w-[320px] border-none !opacity-100 mb-2 pointer-events-auto", 
+               boolToText(status == "success", "alert-success text-white", "alert-error text-white") }
+    >
+        <div class="flex items-center gap-3">
+            if status == "success" {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            } else {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            }
+            <span class="font-bold text-sm">{ message }</span>
+        </div>
+
+        <button 
+            onclick="const a = this.closest('.alert'); a.style.opacity='0'; a.style.transform='scale(0.9)'; setTimeout(() => a.remove(), 100)" 
+            class="btn btn-ghost btn-xs btn-circle bg-black/10 hover:bg-black/20 text-white border-none ml-4"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+
+        <script>
+            
+                // Utilisation de l'ID injecté par Templ
+                const el = document.getElementById("{ toastID }");
+                if (el) {
+                    setTimeout(() => {
+                        if(document.body.contains(el)) {
+                            el.style.opacity = '0';
+                            el.style.transform = 'scale(0.4)';
+                            setTimeout(() => el.remove(), 400);
+                        }
+                    }, 5000);
+                }
+            
+        </script>
+    </span>
+    </div>
+}
+

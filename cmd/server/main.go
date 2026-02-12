@@ -20,6 +20,17 @@ import (
 	"freekiosk-hub/internal/services"
 )
 
+type ApiKeyTransport struct {
+	Transport http.RoundTripper
+	ApiKey    string
+}
+
+func (t *ApiKeyTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	// On ajoute le header à chaque requête sortante
+	req.Header.Add("X-Api-Key", t.ApiKey)
+	return t.Transport.RoundTrip(req)
+}
+
 func main() {
 	// 1. Configuration & Logger initialization
 	cfg := config.Load()
@@ -60,6 +71,11 @@ func main() {
 		}
 	}
 
+	httpClient.Transport = &ApiKeyTransport{
+		Transport: httpClient.Transport,
+		ApiKey:    cfg.KioskApiKey,
+	}
+
 	// 3. Database connection
 	db, err := databases.Open(cfg.DBPath)
 	if err != nil {
@@ -72,7 +88,7 @@ func main() {
 	tabletRepo := repositories.NewTabletRepository(db)
 	reportRepo := repositories.NewReportRepository(db)
 	groupRepo := repositories.NewGroupRepository(db)
-	kioskClient := clients.NewKioskClient(httpClient, cfg.KioskApiKey)
+	kioskClient := clients.NewKioskClient(httpClient)
 
 	// Ensure tables exist
 	if err := tabletRepo.InitTable(); err != nil {
@@ -114,7 +130,7 @@ func main() {
 
 	e := echo.New()
 	e.Renderer = &api.TemplRenderer{}
-	api.NewRouter(e, db.DB, tabletRepo, reportRepo, groupRepo, monitorSvc, cfg.KioskApiKey)
+	api.NewRouter(e, db.DB, tabletRepo, reportRepo, groupRepo, monitorSvc, kioskClient, *cfg)
 	go func() {
 		slog.Info("🌐 Web Server starting", "port", cfg.ServerPort)
 		if err := e.Start(":" + cfg.ServerPort); err != nil && err != http.ErrServerClosed {
