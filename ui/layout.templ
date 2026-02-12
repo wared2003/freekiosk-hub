@@ -44,7 +44,15 @@ templ Layout(title string) {
                                     hx-target="main" 
                                     hx-push-url="true" 
                                     class="rounded-lg hover:bg-primary/10 transition-colors cursor-pointer">
-                                    Tableau de bord
+                                   Dashboard
+                                    </a>
+                                </li>
+                                 <li>
+                                    <a hx-get="/groups" 
+                                    hx-target="main" 
+                                    hx-push-url="true" 
+                                    class="rounded-lg hover:bg-primary/10 transition-colors cursor-pointer">
+                                    Groups
                                     </a>
                                 </li>
                                 <li>

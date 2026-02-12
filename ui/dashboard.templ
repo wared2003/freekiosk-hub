@@ -67,6 +67,18 @@ templ TabletCard(td models.TabletDisplay) {
             <div class="flex justify-between items-start">
                 <div class="overflow-hidden">
                     <h2 class="font-bold text-base truncate">{ td.Name }</h2>
+                    if len(td.Groups) > 0 {
+                        <div class="flex flex-wrap gap-1 mt-1">
+                            for _, g := range td.Groups {
+                                <span 
+                                    class="px-1.5 py-0.5 rounded text-[9px] font-bold text-white border shadow-sm"
+                                    style={ fmt.Sprintf("background-color: %s; border-color: %s;", g.Color, g.Color) }
+                                >
+                                    { g.Name }
+                                </span>
+                            }
+                        </div>
+                    }
                     <p class="text-[10px] font-mono opacity-50">{ td.IP }</p>
                 </div>
                 @StatusBadge(td)

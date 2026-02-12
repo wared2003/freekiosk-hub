@@ -13,12 +13,14 @@ import (
 type HtmlHomeHandler struct {
 	tabletRepo repositories.TabletRepository
 	reportRepo repositories.ReportRepository
+	groupRepo  repositories.GroupRepository
 }
 
-func NewHtmlHomeHandler(tr repositories.TabletRepository, rr repositories.ReportRepository) *HtmlHomeHandler {
+func NewHtmlHomeHandler(tr repositories.TabletRepository, rr repositories.ReportRepository, gr repositories.GroupRepository) *HtmlHomeHandler {
 	return &HtmlHomeHandler{
 		tabletRepo: tr,
 		reportRepo: rr,
+		groupRepo:  gr,
 	}
 }
 
@@ -28,9 +30,11 @@ func (h *HtmlHomeHandler) HandleIndex(c echo.Context) error {
 	var displayList []models.TabletDisplay
 	for _, t := range tablets {
 		report, _ := h.reportRepo.GetLatestByTablet(int64(t.ID), true)
+		groups, _ := h.groupRepo.GetGroupsByTablet(int64(t.ID))
 		displayList = append(displayList, models.TabletDisplay{
 			Tablet:     t,
 			LastReport: report,
+			Groups:     groups,
 		})
 	}
 

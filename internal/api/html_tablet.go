@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"freekiosk-hub/internal/models"
 	"freekiosk-hub/internal/repositories"
 	"freekiosk-hub/ui"
 
@@ -13,10 +14,11 @@ import (
 type HtmlTabletHandler struct {
 	tabletRepo repositories.TabletRepository
 	reportRepo repositories.ReportRepository
+	groupRepo  repositories.GroupRepository
 }
 
-func NewHtmlTabletHandler(tr repositories.TabletRepository, rr repositories.ReportRepository) *HtmlTabletHandler {
-	return &HtmlTabletHandler{tabletRepo: tr, reportRepo: rr}
+func NewHtmlTabletHandler(tr repositories.TabletRepository, rr repositories.ReportRepository, gr repositories.GroupRepository) *HtmlTabletHandler {
+	return &HtmlTabletHandler{tabletRepo: tr, reportRepo: rr, groupRepo: gr}
 }
 
 func (h *HtmlTabletHandler) HandleDetails(c echo.Context) error {
@@ -35,14 +37,22 @@ func (h *HtmlTabletHandler) HandleDetails(c echo.Context) error {
 
 	history, _ := h.reportRepo.GetHistory(id, 30)
 
+	groups, _ := h.groupRepo.GetGroupsByTablet(id)
+
+	td := models.TabletDisplay{
+		Tablet:     *tablet,
+		LastReport: lastReport,
+		Groups:     groups,
+	}
+
 	if c.Request().Header.Get("HX-Request") != "true" {
-		return c.Render(http.StatusOK, "", ui.TabletDetails(tablet, lastReport, history, true))
+		return c.Render(http.StatusOK, "", ui.TabletDetails(&td, history, true))
 	}
 
 	// 2. Si c'est un refresh auto du SSE (on ajoute ?refresh=true dans le hx-get du template)
 	if c.QueryParam("refresh") == "true" {
-		return c.Render(http.StatusOK, "", ui.TabletUIInner(tablet, lastReport, history))
+		return c.Render(http.StatusOK, "", ui.TabletUIInner(&td, history))
 	}
 
-	return c.Render(http.StatusOK, "", ui.TabletDetails(tablet, lastReport, history, false))
+	return c.Render(http.StatusOK, "", ui.TabletDetails(&td, history, false))
 }

@@ -21,17 +21,19 @@ type ApiServer struct {
 	DB         *sql.DB
 	TabletRepo repositories.TabletRepository
 	ReportRepo repositories.ReportRepository
+	GroupRepo  repositories.GroupRepository
 	MonitorSvc services.MonitorService
 	ApiKey     string
 }
 
 // NewRouter initialise le serveur, les handlers et les routes
-func NewRouter(e *echo.Echo, db *sql.DB, tr repositories.TabletRepository, rr repositories.ReportRepository, ms services.MonitorService, apiKey string) *ApiServer {
+func NewRouter(e *echo.Echo, db *sql.DB, tr repositories.TabletRepository, rr repositories.ReportRepository, gr repositories.GroupRepository, ms services.MonitorService, apiKey string) *ApiServer {
 	s := &ApiServer{
 		Echo:       e,
 		DB:         db,
 		TabletRepo: tr,
 		ReportRepo: rr,
+		GroupRepo:  gr,
 		MonitorSvc: ms,
 		ApiKey:     apiKey,
 	}
@@ -84,8 +86,9 @@ func (s *ApiServer) setupMiddlewares() {
 
 func (s *ApiServer) setupRoutes() {
 
-	homeH := NewHtmlHomeHandler(s.TabletRepo, s.ReportRepo)
-	tabletH := NewHtmlTabletHandler(s.TabletRepo, s.ReportRepo)
+	homeH := NewHtmlHomeHandler(s.TabletRepo, s.ReportRepo, s.GroupRepo)
+	tabletH := NewHtmlTabletHandler(s.TabletRepo, s.ReportRepo, s.GroupRepo)
+	groupH := NewGroupHandler(s.GroupRepo)
 
 	systemJsonH := NewSystemJSONHandler(s.DB)
 
@@ -94,6 +97,15 @@ func (s *ApiServer) setupRoutes() {
 
 	s.Echo.GET("/", homeH.HandleIndex)
 	s.Echo.GET("/tablets/:id", tabletH.HandleDetails)
+
+	groupRoutes := s.Echo.Group("/groups")
+	{
+		groupRoutes.GET("", groupH.HandleGroups)
+		groupRoutes.GET("/new", groupH.HandleNewGroup)
+		groupRoutes.GET("/edit/:id", groupH.HandleEditGroup)
+		groupRoutes.POST("/save", groupH.HandleSaveGroup)
+		groupRoutes.DELETE("/:id", groupH.HandleDeleteGroup)
+	}
 
 	// s.Echo.GET("/admin/import", adminPageH.HandleImportPage)
 

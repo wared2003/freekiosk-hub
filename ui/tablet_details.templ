@@ -4,6 +4,7 @@ import (
     "freekiosk-hub/internal/repositories"
     "fmt"
     "encoding/json"
+	"freekiosk-hub/internal/models"
 )
 
 // --- Fonctions utilitaires inchangées ---
@@ -50,18 +51,17 @@ func getFullHistoryJSON(history []repositories.TabletReport) (string, string) {
 
 // --- Logique des Templates ---
 
-templ TabletDetails(t *repositories.Tablet, last *repositories.TabletReport, history []repositories.TabletReport, fullPage bool) {
+templ TabletDetails(t *models.TabletDisplay, history []repositories.TabletReport, fullPage bool) {
     if fullPage {
         @Layout(fmt.Sprintf("Détails %s", t.Name)) {
-            @TabletDetailsContent(t, last, history)
+            @TabletDetailsContent(t, history)
         }
     } else {
-        @TabletDetailsContent(t, last, history)
+        @TabletDetailsContent(t, history)
     }
 }
 
-// Cette partie gère l'enveloppe SSE. Elle n'est appelée qu'une fois (Page ou Navigation HTMX)
-templ TabletDetailsContent(t *repositories.Tablet, last *repositories.TabletReport, history []repositories.TabletReport) {
+templ TabletDetailsContent(t *models.TabletDisplay, history []repositories.TabletReport) {
     <div hx-ext="sse" sse-connect={ fmt.Sprintf("/sse/tablet/%d", t.ID) }>
         <div 
             id="details-container"
@@ -71,19 +71,18 @@ templ TabletDetailsContent(t *repositories.Tablet, last *repositories.TabletRepo
             hx-swap="innerHTML"
             class="px-6 pb-12 space-y-6"
         >
-            @TabletUIInner(t, last, history)
+            @TabletUIInner(t, history)
         </div>
     </div>
 }
 
-// Cette partie contient tout ton contenu métier et les graphiques
-templ TabletUIInner(t *repositories.Tablet, last *repositories.TabletReport, history []repositories.TabletReport) {
+templ TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport) {
     {{ historyData, rawJSON := getFullHistoryJSON(history) }}
     
     {{
         deviceIP := "N/A"
-        if last != nil {
-            deviceIP = last.DeviceIP
+        if t.LastReport != nil {
+            deviceIP = t.LastReport.DeviceIP
         }
     }}
 
@@ -93,6 +92,13 @@ templ TabletUIInner(t *repositories.Tablet, last *repositories.TabletReport, his
             <div>
                 <h1 class="text-3xl font-black tracking-tight text-slate-800">{ t.Name }</h1>
                 <p class="text-xs font-mono opacity-50">Hub: { t.IP } | Local: { deviceIP }</p>
+                if len(t.Groups) > 0 {
+                     <div class="h-4 w-[1px] bg-slate-200 mx-1"></div> for _, g := range t.Groups {
+                    @GroupBadge(g)
+                    }
+                } else {
+                    <span class="text-[10px] text-slate-300 italic">Aucun groupe assigné</span>
+                }
             </div>
         </div>
         <div class="flex gap-2">
@@ -102,16 +108,16 @@ templ TabletUIInner(t *repositories.Tablet, last *repositories.TabletReport, his
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-12 gap-6">
-        if last != nil {
+        if t.LastReport != nil {
             <div class="xl:col-span-3 space-y-6">
-                @SectionDisplay(last)
-                @SectionWebview(last)
+                @SectionDisplay(t.LastReport)
+                @SectionWebview(t.LastReport)
             </div>
 
             <div class="xl:col-span-3 space-y-6">
-                @SectionNetwork(last)
-                @SectionSystem(last)
-                @SectionSensors(last)
+                @SectionNetwork(t.LastReport)
+                @SectionSystem(t.LastReport)
+                @SectionSensors(t.LastReport)
             </div>
 
             <div class="xl:col-span-6 space-y-6">
@@ -369,8 +375,19 @@ templ detailRow(label string, value string) {
     </div>
 }
 
+templ GroupBadge(g repositories.Group) {
+    <span 
+        class="badge badge-sm font-bold text-white border-none cursor-help"
+        style={ fmt.Sprintf("background-color: %s;", g.Color) }
+        title={ g.Description }
+    >
+        { g.Name }
+    </span>
+}
+
 func getSignalColor(level int) string {
     if level >= 75 { return "text-success" }
     if level >= 40 { return "text-warning" }
     return "text-error"
 }
+

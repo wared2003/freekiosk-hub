@@ -71,6 +71,7 @@ func main() {
 	// 4. Repositories & Clients initialization
 	tabletRepo := repositories.NewTabletRepository(db)
 	reportRepo := repositories.NewReportRepository(db)
+	groupRepo := repositories.NewGroupRepository(db)
 	kioskClient := clients.NewKioskClient(httpClient, cfg.KioskApiKey)
 
 	// Ensure tables exist
@@ -80,6 +81,10 @@ func main() {
 	}
 	if err := reportRepo.InitTable(); err != nil {
 		slog.Error("❌ Failed to initialize reports table", "error", err)
+		os.Exit(1)
+	}
+	if err := groupRepo.InitTable(); err != nil {
+		slog.Error("Échec initialisation table groups", "err", err)
 		os.Exit(1)
 	}
 	slog.Info("✅ Database schema is ready")
@@ -109,7 +114,7 @@ func main() {
 
 	e := echo.New()
 	e.Renderer = &api.TemplRenderer{}
-	api.NewRouter(e, db.DB, tabletRepo, reportRepo, monitorSvc, cfg.KioskApiKey)
+	api.NewRouter(e, db.DB, tabletRepo, reportRepo, groupRepo, monitorSvc, cfg.KioskApiKey)
 	go func() {
 		slog.Info("🌐 Web Server starting", "port", cfg.ServerPort)
 		if err := e.Start(":" + cfg.ServerPort); err != nil && err != http.ErrServerClosed {
