@@ -15,3 +15,5 @@ freekiosk-hub
 # Logs & OS
 *.log
 .DS_Store
+
+*_templ.go
