@@ -1,0 +1,103 @@
+package api
+
+import (
+	"database/sql"
+	"log/slog"
+
+	"freekiosk-hub/internal/repositories"
+	"freekiosk-hub/internal/services"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
+
+// ApiServer centralise les dépendances pour le routage
+type ApiServer struct {
+	Echo       *echo.Echo
+	DB         *sql.DB
+	TabletRepo repositories.TabletRepository
+	ReportRepo repositories.ReportRepository
+	MonitorSvc services.MonitorService
+	ApiKey     string
+}
+
+// NewRouter initialise le serveur, les handlers et les routes
+func NewRouter(e *echo.Echo, db *sql.DB, tr repositories.TabletRepository, rr repositories.ReportRepository, ms services.MonitorService, apiKey string) *ApiServer {
+	s := &ApiServer{
+		Echo:       e,
+		DB:         db,
+		TabletRepo: tr,
+		ReportRepo: rr,
+		MonitorSvc: ms,
+		ApiKey:     apiKey,
+	}
+
+	s.setupMiddlewares()
+	s.setupRoutes()
+
+	return s
+}
+
+func (s *ApiServer) setupMiddlewares() {
+	// Nouveau RequestLogger : Plus propre et structuré
+	s.Echo.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus:   true,
+		LogURI:      true,
+		LogMethod:   true,
+		LogLatency:  true,
+		LogError:    true,
+		LogRemoteIP: true,
+		HandleError: true, // Pour que les erreurs passent aussi par ici
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			if v.Error != nil {
+				slog.Error("HTTP Request Error",
+					"method", v.Method,
+					"uri", v.URI,
+					"status", v.Status,
+					"latency", v.Latency,
+					"remote_ip", v.RemoteIP,
+					"error", v.Error,
+				)
+			} else {
+				slog.Info("HTTP Request",
+					"method", v.Method,
+					"uri", v.URI,
+					"status", v.Status,
+					"latency", v.Latency,
+					"remote_ip", v.RemoteIP,
+				)
+			}
+			return nil
+		},
+	}))
+
+	s.Echo.Use(middleware.Recover())
+	s.Echo.Static("/static", "static")
+}
+
+func (s *ApiServer) setupRoutes() {
+
+	homeH := NewHtmlHomeHandler(s.TabletRepo, s.ReportRepo)
+	tabletH := NewHtmlTabletHandler(s.TabletRepo, s.ReportRepo)
+
+	systemJsonH := NewSystemJSONHandler(s.DB)
+
+	// --- 2. ROUTES PUBLIQUES / SYSTÈME ---
+	s.Echo.GET("/health", systemJsonH.HandleHealthCheck)
+
+	s.Echo.GET("/", homeH.HandleIndex)
+	s.Echo.GET("/tablets/:id", tabletH.HandleDetails)
+
+	// s.Echo.GET("/admin/import", adminPageH.HandleImportPage)
+
+	// // --- 4. ROUTES API (JSON) ---
+	// // On groupe les routes API sous /api/v1
+	// apiV1 := s.Echo.Group("/api/v1")
+
+	// // Si une clé API est configurée, on pourrait ajouter un middleware ici
+	// // apiV1.Use(CustomApiKeyMiddleware(s.ApiKey))
+
+	// apiV1.GET("/tablets", tabletJsonH.HandleListTablets)
+	// apiV1.POST("/tablets/import", tabletJsonH.HandleBulkImport) // Pour tes 500 tablettes
+	// apiV1.POST("/tablets/:ip/scan", tabletJsonH.HandleManualScan)
+}

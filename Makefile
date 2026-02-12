@@ -31,9 +31,14 @@ clean:
 	@rm -rf bin/
 	@if [ -f $(DB_NAME) ]; then rm $(DB_NAME); echo "🗑️ Base de données supprimée"; fi
 
+generate:
+	@echo "🎨 Génération des templates Templ..."
+	@templ generate
+
 ## help: Affiche cette aide
 help:
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+

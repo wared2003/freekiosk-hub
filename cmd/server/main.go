@@ -9,6 +9,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/labstack/echo/v4"
+
+	"freekiosk-hub/internal/api"
 	"freekiosk-hub/internal/clients"
 	"freekiosk-hub/internal/config"
 	"freekiosk-hub/internal/databases"
@@ -104,14 +107,22 @@ func main() {
 		slog.Warn("ℹ️ Automatic monitoring is disabled (POLL_INTERVAL <= 0)")
 	}
 
-	// 7. Wait for shutdown signal
-	slog.Info("🌐 Hub is fully operational. Waiting for interrupt signals...")
+	e := echo.New()
+	e.Renderer = &api.TemplRenderer{}
+	api.NewRouter(e, db.DB, tabletRepo, reportRepo, monitorSvc, cfg.KioskApiKey)
+	go func() {
+		slog.Info("🌐 Web Server starting", "port", cfg.ServerPort)
+		if err := e.Start(":" + cfg.ServerPort); err != nil && err != http.ErrServerClosed {
+			slog.Error("❌ Server failed", "error", err)
+			os.Exit(1)
+		}
+	}()
 
+	slog.Info("🌐 Hub is fully operational. Waiting for interrupt signals...")
 	<-ctx.Done()
 
 	slog.Warn("⚠️ Shutdown signal received, stopping server...")
 
-	// Brief pause to allow workers to wrap up
 	time.Sleep(1 * time.Second)
 	slog.Info("👋 Shutdown complete. Bye!")
 }
