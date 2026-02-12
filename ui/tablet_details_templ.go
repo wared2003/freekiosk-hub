@@ -11,8 +11,8 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"encoding/json"
 	"fmt"
-	"freekiosk-hub/internal/models"
-	"freekiosk-hub/internal/repositories"
+	"github.com/wared2003/freekiosk-hub/internal/models"
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
 )
 
 type ButtonVariant string

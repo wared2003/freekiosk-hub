@@ -11,13 +11,19 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"freekiosk-hub/internal/api"
-	"freekiosk-hub/internal/clients"
-	"freekiosk-hub/internal/config"
-	"freekiosk-hub/internal/databases"
-	"freekiosk-hub/internal/network"
-	"freekiosk-hub/internal/repositories"
-	"freekiosk-hub/internal/services"
+	"github.com/wared2003/freekiosk-hub/internal/services"
+
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
+
+	"github.com/wared2003/freekiosk-hub/internal/network"
+
+	"github.com/wared2003/freekiosk-hub/internal/databases"
+
+	"github.com/wared2003/freekiosk-hub/internal/config"
+
+	"github.com/wared2003/freekiosk-hub/internal/clients"
+
+	"github.com/wared2003/freekiosk-hub/internal/api"
 )
 
 type ApiKeyTransport struct {

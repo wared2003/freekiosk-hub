@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"freekiosk-hub/internal/repositories"
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
 )
 
 func GroupsPage(groups []repositories.Group, tableData map[int64][]repositories.Tablet) templ.Component {

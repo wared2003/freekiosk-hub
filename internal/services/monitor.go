@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"freekiosk-hub/internal/clients"
-	"freekiosk-hub/internal/repositories"
-	"freekiosk-hub/internal/sse"
+	"github.com/wared2003/freekiosk-hub/internal/clients"
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
+	"github.com/wared2003/freekiosk-hub/internal/sse"
 )
 
 type MonitorService interface {

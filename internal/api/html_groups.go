@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"freekiosk-hub/internal/repositories"
-	"freekiosk-hub/ui"
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
+	"github.com/wared2003/freekiosk-hub/ui"
 
 	"github.com/labstack/echo/v4"
 )

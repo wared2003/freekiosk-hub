@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"freekiosk-hub/internal/repositories"
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
 )
 
 type KioskClient interface {

@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"freekiosk-hub/internal/models"
+	"github.com/wared2003/freekiosk-hub/internal/models"
 	"time"
 )
 

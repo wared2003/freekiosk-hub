@@ -6,10 +6,10 @@ import (
 	"net/url"
 	"strconv"
 
-	"freekiosk-hub/internal/models"
-	"freekiosk-hub/internal/repositories"
-	"freekiosk-hub/internal/services"
-	"freekiosk-hub/ui"
+	"github.com/wared2003/freekiosk-hub/internal/models"
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
+	"github.com/wared2003/freekiosk-hub/internal/services"
+	"github.com/wared2003/freekiosk-hub/ui"
 
 	"github.com/labstack/echo/v4"
 )

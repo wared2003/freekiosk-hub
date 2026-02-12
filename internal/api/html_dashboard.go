@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 
-	"freekiosk-hub/internal/models"
-	"freekiosk-hub/internal/repositories"
-	"freekiosk-hub/ui"
+	"github.com/wared2003/freekiosk-hub/internal/models"
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
+	"github.com/wared2003/freekiosk-hub/ui"
 
 	"github.com/labstack/echo/v4"
 )

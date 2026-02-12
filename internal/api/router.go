@@ -7,11 +7,11 @@ import (
 	"strconv"
 	"strings"
 
-	"freekiosk-hub/internal/clients"
-	"freekiosk-hub/internal/config"
-	"freekiosk-hub/internal/repositories"
-	"freekiosk-hub/internal/services"
-	"freekiosk-hub/internal/sse"
+	"github.com/wared2003/freekiosk-hub/internal/clients"
+	"github.com/wared2003/freekiosk-hub/internal/config"
+	"github.com/wared2003/freekiosk-hub/internal/repositories"
+	"github.com/wared2003/freekiosk-hub/internal/services"
+	"github.com/wared2003/freekiosk-hub/internal/sse"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"

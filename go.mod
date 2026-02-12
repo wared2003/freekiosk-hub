@@ -1,4 +1,4 @@
-module freekiosk-hub
+module github.com/wared2003/freekiosk-hub
 
 go 1.25.5
 
