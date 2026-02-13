@@ -351,3 +351,50 @@ func (h *HtmlTabletHandler) HandleStopSound(c echo.Context) error {
 
 	return nil
 }
+
+func (h *HtmlTabletHandler) HandleGtslTTSSound(c echo.Context) error {
+	// 1. Get Tablet ID from URL
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		return ui.Toast("Invalid Tablet ID", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	// 2. Get Form Values
+	text := c.FormValue("tts_text")
+	if text == "" {
+		return ui.Toast("Please enter some text", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	lang := c.FormValue("lang")
+	if lang == "" {
+		lang = "en"
+	}
+
+	loop := c.FormValue("loop") == "on"
+
+	volumeStr := c.FormValue("volume")
+	volume, _ := strconv.Atoi(volumeStr)
+	if volume == 0 {
+		volume = 100 // Default volume
+	}
+
+	safeText := url.QueryEscape(text)
+	safeLang := url.QueryEscape(lang)
+	ttsURL := fmt.Sprintf("https://translate.google.com/translate_tts?ie=UTF-8&tl=%s&client=tw-ob&q=%s", safeLang, safeText)
+
+	report, err := h.kService.PlayAudio(services.Target{TabletID: id}, ttsURL, loop, volume)
+	if err != nil {
+		return ui.Toast("Service Error: "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.Toast(fmt.Sprintf("🗣️ %s: Announcement sent", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.Toast(fmt.Sprintf("❌ %s: Delivery failed", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+
+	return nil
+}

@@ -1717,20 +1717,20 @@ func TabSoundModal(sounds []services.SoundFileInfo, tabletID int64) templ.Compon
 			templ_7745c5c3_Var79 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "<dialog id=\"sound_modal\" class=\"modal modal-open\"><div class=\"modal-box bg-white max-w-2xl border border-slate-200 p-0 shadow-2xl\"><div class=\"p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50\"><h3 class=\"font-black text-sm uppercase tracking-widest text-slate-800\">Sound Library</h3><button type=\"button\" class=\"btn btn-xs btn-circle btn-ghost\" onclick=\"this.closest('dialog').remove()\">✕</button></div><div class=\"p-6\"><form hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "<dialog id=\"sound_modal\" class=\"modal modal-open\"><div class=\"modal-box bg-white max-w-2xl border border-slate-200 p-0 shadow-2xl\"><div class=\"p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50\"><h3 class=\"font-black text-sm uppercase tracking-widest text-slate-800 flex items-center gap-2\"><span class=\"text-primary text-lg\">🔊</span> Sound Library</h3><button type=\"button\" class=\"btn btn-xs btn-circle btn-ghost\" onclick=\"this.closest('dialog').remove()\">✕</button></div><div class=\"p-6\"><form hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var80 string
 		templ_7745c5c3_Var80, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/sound/upload", tabletID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 604, Col: 79}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 606, Col: 79}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var80))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "\" hx-encoding=\"multipart/form-data\" hx-target=\"#sound-list-container\" class=\"flex gap-2 p-4 bg-primary/5 rounded-xl border border-primary/10 mb-8\"><input type=\"file\" name=\"soundFile\" class=\"file-input file-input-bordered file-input-primary file-input-sm w-full\" accept=\"audio/*\" required> <button type=\"submit\" class=\"btn btn-sm btn-primary px-6 text-white uppercase font-bold text-xs\">Upload</button></form><div id=\"sound-list-container\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "\" hx-encoding=\"multipart/form-data\" hx-target=\"#sound-list-container\" class=\"flex gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 mb-6\"><input type=\"file\" name=\"soundFile\" class=\"file-input file-input-bordered file-input-primary file-input-sm w-full\" accept=\"audio/*\" required> <button type=\"submit\" class=\"btn btn-sm btn-primary px-6 text-white uppercase font-bold text-xs\">Upload</button></form><div id=\"sound-list-container\" class=\"max-h-[250px] overflow-y-auto pr-2 custom-scrollbar mb-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1738,20 +1738,33 @@ func TabSoundModal(sounds []services.SoundFileInfo, tabletID int64) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "</div></div><div class=\"p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2\"><button class=\"btn btn-sm btn-ghost text-[10px] uppercase font-bold\" onclick=\"this.closest('dialog').remove()\">Fermer</button> <button class=\"btn btn-sm btn-error btn-outline text-[10px] font-bold uppercase\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "</div><div class=\"pt-6 border-t border-slate-100\"><h4 class=\"text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3\">Text To Speech</h4><form hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var81 string
-		templ_7745c5c3_Var81, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/stop-sound", tabletID))
+		templ_7745c5c3_Var81, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/gtsl-tts", tabletID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 622, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 621, Col: 89}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var81))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-swap=\"none\">🛑 Stop All</button></div></div><form method=\"dialog\" class=\"modal-backdrop\"><button onclick=\"this.closest('dialog').remove()\">close</button></form></dialog>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-swap=\"none\" class=\"space-y-3\"><div class=\"relative\"><textarea name=\"tts_text\" class=\"textarea textarea-bordered w-full bg-slate-50 text-slate-800 text-sm focus:bg-white transition-all min-h-[100px] pb-12\" placeholder=\"Type what the kiosk should say...\"></textarea><div class=\"absolute bottom-2 left-2 right-2 flex justify-between items-center px-2 py-1 bg-white/90 rounded-md border border-slate-100 shadow-sm\"><div class=\"flex items-center gap-3\"><div class=\"flex items-center gap-1\"><span class=\"text-[9px] font-black text-slate-400 uppercase\">Lang</span> <select name=\"lang\" class=\"select select-ghost select-xs text-[10px] font-bold focus:bg-transparent\"><option value=\"fr\">🇫🇷 FR</option> <option value=\"en\" selected>🇺🇸 EN</option> <option value=\"es\">🇪🇸 ES</option> <option value=\"de\">🇩🇪 DE</option> <option value=\"it\">🇮🇹 IT</option> <option value=\"pt\">🇵🇹 PT</option> <option value=\"ru\">🇷🇺 RU</option> <option value=\"ar\">🇸🇦 AR</option> <option value=\"tr\">🇹🇷 TR</option> <option value=\"pl\">🇵🇱 PL</option> <option value=\"zh-CN\">🇨🇳 ZH</option> <option value=\"ja\">🇯🇵 JP</option> <option value=\"ko\">🇰🇷 KO</option> <option value=\"vi\">🇻🇳 VI</option> <option value=\"th\">🇹🇭 TH</option></select></div><div class=\"h-4 w-[1px] bg-slate-200\"></div><label class=\"flex items-center gap-1 cursor-pointer\"><span class=\"text-[9px] font-black text-slate-400 uppercase\">Loop</span> <input type=\"checkbox\" name=\"loop\" class=\"checkbox checkbox-primary checkbox-xs\"></label></div><div class=\"flex items-center gap-2\"><span class=\"text-[10px] font-bold text-slate-400\">VOL</span> <input type=\"range\" name=\"volume\" min=\"0\" max=\"100\" value=\"80\" class=\"range range-xs range-primary w-24\"></div></div></div><button type=\"submit\" class=\"btn btn-sm btn-block btn-primary text-white font-bold uppercase text-[10px] tracking-widest\">📢 Broadcast Announcement</button></form></div></div><div class=\"p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2\"><button class=\"btn btn-sm btn-ghost text-[10px] uppercase font-bold\" onclick=\"this.closest('dialog').remove()\">Fermer</button> <button class=\"btn btn-sm btn-error btn-outline text-[10px] font-bold uppercase\" hx-post=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var82 string
+		templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/stop-sound", tabletID))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 673, Col: 85}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var82))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "\" hx-swap=\"none\">🛑 Stop All</button></div></div><form method=\"dialog\" class=\"modal-backdrop\"><button onclick=\"this.closest('dialog').remove()\">close</button></form></dialog>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -1775,137 +1788,137 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var82 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var82 == nil {
-			templ_7745c5c3_Var82 = templ.NopComponent
+		templ_7745c5c3_Var83 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var83 == nil {
+			templ_7745c5c3_Var83 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if len(sounds) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "<div class=\"text-center py-10 opacity-30 border-2 border-dashed border-slate-200 rounded-2xl\"><p class=\"text-xs font-black uppercase tracking-widest\">Library is empty</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<div class=\"text-center py-10 opacity-30 border-2 border-dashed border-slate-200 rounded-2xl\"><p class=\"text-xs font-black uppercase tracking-widest\">Library is empty</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
 		for i, sound := range sounds {
 			safeID := fmt.Sprintf("snd-%d", i)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<div class=\"flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 group shadow-sm mb-2 last:mb-0 hover:border-primary/20 transition-all\"><div class=\"flex-1 min-w-0 mr-4\"><div class=\"flex items-center gap-2\"><span class=\"text-xs font-black text-slate-700 truncate\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var83 string
-			templ_7745c5c3_Var83, templ_7745c5c3_Err = templ.JoinStringErrs(sound.Name)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 646, Col: 89}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var83))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "</span> <span class=\"badge badge-ghost badge-xs font-bold opacity-40 uppercase\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<div class=\"flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 group shadow-sm mb-2 last:mb-0 hover:border-primary/20 transition-all\"><div class=\"flex-1 min-w-0 mr-4\"><div class=\"flex items-center gap-2\"><span class=\"text-xs font-black text-slate-700 truncate\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var84 string
-			templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.JoinStringErrs(sound.Extension)
+			templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.JoinStringErrs(sound.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 647, Col: 109}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 697, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var84))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "</span></div><p class=\"text-[8px] opacity-30 truncate font-mono mt-0.5\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "</span> <span class=\"badge badge-ghost badge-xs font-bold opacity-40 uppercase\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var85 string
-			templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.JoinStringErrs(sound.URL)
+			templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.JoinStringErrs(sound.Extension)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 649, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 698, Col: 109}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var85))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "</p></div><div class=\"flex items-center gap-4 bg-slate-50 p-2 rounded-lg border border-slate-100\"><input type=\"hidden\" name=\"soundUrl\" id=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 109, "</span></div><p class=\"text-[8px] opacity-30 truncate font-mono mt-0.5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var86 string
-			templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.JoinStringErrs("url-" + safeID)
+			templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.JoinStringErrs(sound.URL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 654, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 700, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var86))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "</p></div><div class=\"flex items-center gap-4 bg-slate-50 p-2 rounded-lg border border-slate-100\"><input type=\"hidden\" name=\"soundUrl\" id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var87 string
-			templ_7745c5c3_Var87, templ_7745c5c3_Err = templ.JoinStringErrs(sound.URL)
+			templ_7745c5c3_Var87, templ_7745c5c3_Err = templ.JoinStringErrs("url-" + safeID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 654, Col: 93}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 705, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var87))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "\"><div class=\"flex flex-col gap-1\"><span class=\"text-[8px] font-black opacity-40 leading-none text-center\">VOL</span> <input type=\"range\" name=\"volume\" min=\"0\" max=\"100\" value=\"100\" class=\"range range-xs range-primary w-16\" id=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var88 string
-			templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.JoinStringErrs("vol-" + safeID)
+			templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.JoinStringErrs(sound.URL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 663, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 705, Col: 93}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var88))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "\"></div><div class=\"flex flex-col items-center gap-1\"><span class=\"text-[8px] font-black opacity-40 leading-none\">LOOP</span> <input type=\"checkbox\" name=\"loop\" class=\"checkbox checkbox-primary checkbox-xs\" id=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "\"><div class=\"flex flex-col gap-1\"><span class=\"text-[8px] font-black opacity-40 leading-none text-center\">VOL</span> <input type=\"range\" name=\"volume\" min=\"0\" max=\"100\" value=\"100\" class=\"range range-xs range-primary w-16\" id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var89 string
-			templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.JoinStringErrs("loop-" + safeID)
+			templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.JoinStringErrs("vol-" + safeID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 673, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 714, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var89))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\"></div><button class=\"btn btn-sm btn-primary text-white font-bold text-[10px] px-4 shadow-lg shadow-primary/20\" hx-post=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 113, "\"></div><div class=\"flex flex-col items-center gap-1\"><span class=\"text-[8px] font-black opacity-40 leading-none\">LOOP</span> <input type=\"checkbox\" name=\"loop\" class=\"checkbox checkbox-primary checkbox-xs\" id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var90 string
-			templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/play-sound", tabletID))
+			templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.JoinStringErrs("loop-" + safeID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 679, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 724, Col: 45}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var90))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "\" hx-swap=\"none\" hx-include=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 114, "\"></div><button class=\"btn btn-sm btn-primary text-white font-bold text-[10px] px-4 shadow-lg shadow-primary/20\" hx-post=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var91 string
-			templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("#url-%s, #vol-%s, #loop-%s", safeID, safeID, safeID))
+			templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/play-sound", tabletID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 681, Col: 98}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 730, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var91))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "\">PLAY</button></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "\" hx-swap=\"none\" hx-include=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var92 string
+			templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("#url-%s, #vol-%s, #loop-%s", safeID, safeID, safeID))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 732, Col: 98}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var92))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "\">PLAY</button></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

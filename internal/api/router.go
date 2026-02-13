@@ -134,6 +134,7 @@ func (s *ApiServer) setupRoutes() {
 		//e.DELETE("/sound/:filename", tabletH.HandleDeleteSound)
 
 		tablets.POST("/:id/command/play-sound", tabletH.HandlePlaySound)
+		tablets.POST("/:id/command/gtsl-tts", tabletH.HandleGtslTTSSound)
 		tablets.POST("/:id/command/stop-sound", tabletH.HandleStopSound)
 
 	}
