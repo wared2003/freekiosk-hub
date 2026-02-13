@@ -133,8 +133,8 @@ func (s *ApiServer) setupRoutes() {
 		tablets.POST("/:id/sound/upload", tabletH.HandleUploadSound)
 		//e.DELETE("/sound/:filename", tabletH.HandleDeleteSound)
 
-		tablets.POST("/:id/command/play-sound", tabletH.HandlePlaySound) // Ta nouvelle route !
-		//tablets.POST("/:id/command/stop-sound", tabletH.HandleStopSound)
+		tablets.POST("/:id/command/play-sound", tabletH.HandlePlaySound)
+		tablets.POST("/:id/command/stop-sound", tabletH.HandleStopSound)
 
 	}
 

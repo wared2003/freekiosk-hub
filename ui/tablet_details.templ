@@ -620,6 +620,7 @@ templ TabSoundModal(sounds []services.SoundFileInfo, tabletID int64) {
                 <button 
                     class="btn btn-sm btn-error btn-outline text-[10px] font-bold uppercase"
                     hx-post={ fmt.Sprintf("/tablets/%d/command/stop-sound", tabletID) }
+                    hx-swap="none"
                 >🛑 Stop All</button>
             </div>
         </div>
@@ -657,7 +658,7 @@ templ TabSoundList(sounds []services.SoundFileInfo, tabletID int64) {
                     <input 
                         type="range" 
                         name="volume" 
-                        min="0" max="100" value="70" 
+                        min="0" max="100" value="100" 
                         class="range range-xs range-primary w-16" 
                         id={ "vol-" + safeID } 
                     />
@@ -676,6 +677,7 @@ templ TabSoundList(sounds []services.SoundFileInfo, tabletID int64) {
                 <button 
                     class="btn btn-sm btn-primary text-white font-bold text-[10px] px-4 shadow-lg shadow-primary/20"
                     hx-post={ fmt.Sprintf("/tablets/%d/command/play-sound", tabletID) }
+                    hx-swap="none"
                     hx-include={ fmt.Sprintf("#url-%s, #vol-%s, #loop-%s", safeID, safeID, safeID) }
                 >
                     PLAY

@@ -331,3 +331,23 @@ func (h *HtmlTabletHandler) HandlePlaySound(c echo.Context) error {
 	}
 	return nil
 }
+
+func (h *HtmlTabletHandler) HandleStopSound(c echo.Context) error {
+	idParam := c.Param("id")
+	id, _ := strconv.ParseInt(idParam, 10, 64)
+
+	report, err := h.kService.StopAudio(services.Target{TabletID: id})
+	if err != nil {
+		return ui.Toast("Erreur : "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.Toast(fmt.Sprintf("🛑 %s : Playback stopped", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.Toast(fmt.Sprintf("❌ %s : Failed to stop", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+
+	return nil
+}
