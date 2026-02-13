@@ -17,3 +17,8 @@ freekiosk-hub
 .DS_Store
 
 *_templ.go
+
+media
+media/*
+upload
+upload/*

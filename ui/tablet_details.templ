@@ -5,6 +5,7 @@ import (
     "fmt"
     "encoding/json"
 	"github.com/wared2003/freekiosk-hub/internal/models"
+    "github.com/wared2003/freekiosk-hub/internal/services"
 )
 
 type ButtonVariant string
@@ -127,6 +128,7 @@ templ TabletUIInner(t *models.TabletDisplay, history []repositories.TabletReport
 
             <div class="divider divider-horizontal mx-0"></div>
             @ActionButton("Beep", IconBeep(), fmt.Sprintf("/tablets/%d/command/beep", t.ID), "POST", BtnNormal)
+            @ActionButton("Audio", Emoji("🔊"), fmt.Sprintf("/tablets/%d/sound-modal", t.ID), "GET", BtnNormal)
             @ActionButton("Capture", IconCamera(), "#", "POST", BtnNormal)
             @ActionButton("Wake up", Emoji("⏰"), fmt.Sprintf("/tablets/%d/command/wake", t.ID), "POST", BtnNormal)
             @ActionButton("Reload", IconReload(), fmt.Sprintf("/tablets/%d/command/reload", t.ID), "POST", BtnWarning)           
@@ -589,3 +591,96 @@ templ NavigateModal(tabletID int64, currentURL string) {
     </dialog>
 }
 
+templ TabSoundModal(sounds []services.SoundFileInfo, tabletID int64) {
+    <dialog id="sound_modal" class="modal modal-open">
+        <div class="modal-box bg-white max-w-2xl border border-slate-200 p-0 shadow-2xl">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="font-black text-sm uppercase tracking-widest text-slate-800">Sound Library</h3>
+                <button type="button" class="btn btn-xs btn-circle btn-ghost" onclick="this.closest('dialog').remove()">✕</button>
+            </div>
+
+            <div class="p-6">
+                <form 
+                    hx-post={ fmt.Sprintf("/tablets/%d/sound/upload", tabletID) } 
+                    hx-encoding="multipart/form-data" 
+                    hx-target="#sound-list-container"
+                    class="flex gap-2 p-4 bg-primary/5 rounded-xl border border-primary/10 mb-8"
+                >
+                    <input type="file" name="soundFile" class="file-input file-input-bordered file-input-primary file-input-sm w-full" accept="audio/*" required />
+                    <button type="submit" class="btn btn-sm btn-primary px-6 text-white uppercase font-bold text-xs">Upload</button>
+                </form>
+
+                <div id="sound-list-container">
+                    @TabSoundList(sounds, tabletID)
+                </div>
+            </div>
+            
+            <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
+                <button class="btn btn-sm btn-ghost text-[10px] uppercase font-bold" onclick="this.closest('dialog').remove()">Fermer</button>
+                <button 
+                    class="btn btn-sm btn-error btn-outline text-[10px] font-bold uppercase"
+                    hx-post={ fmt.Sprintf("/tablets/%d/command/stop-sound", tabletID) }
+                >🛑 Stop All</button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button onclick="this.closest('dialog').remove()">close</button>
+        </form>
+    </dialog>
+}
+
+templ TabSoundList(sounds []services.SoundFileInfo, tabletID int64) {
+    if len(sounds) == 0 {
+        <div class="text-center py-10 opacity-30 border-2 border-dashed border-slate-200 rounded-2xl">
+            <p class="text-xs font-black uppercase tracking-widest">Library is empty</p>
+        </div>
+    }
+
+    for i, sound := range sounds {
+        {{ safeID := fmt.Sprintf("snd-%d", i) }}
+        
+        <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 group shadow-sm mb-2 last:mb-0 hover:border-primary/20 transition-all">
+            <div class="flex-1 min-w-0 mr-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-black text-slate-700 truncate">{ sound.Name }</span>
+                    <span class="badge badge-ghost badge-xs font-bold opacity-40 uppercase">{ sound.Extension }</span>
+                </div>
+                <p class="text-[8px] opacity-30 truncate font-mono mt-0.5">{ sound.URL }</p>
+            </div>
+
+            <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                
+                <input type="hidden" name="soundUrl" id={ "url-" + safeID } value={ sound.URL } />
+
+                <div class="flex flex-col gap-1">
+                    <span class="text-[8px] font-black opacity-40 leading-none text-center">VOL</span>
+                    <input 
+                        type="range" 
+                        name="volume" 
+                        min="0" max="100" value="70" 
+                        class="range range-xs range-primary w-16" 
+                        id={ "vol-" + safeID } 
+                    />
+                </div>
+
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-[8px] font-black opacity-40 leading-none">LOOP</span>
+                    <input 
+                        type="checkbox" 
+                        name="loop" 
+                        class="checkbox checkbox-primary checkbox-xs" 
+                        id={ "loop-" + safeID } 
+                    />
+                </div>
+
+                <button 
+                    class="btn btn-sm btn-primary text-white font-bold text-[10px] px-4 shadow-lg shadow-primary/20"
+                    hx-post={ fmt.Sprintf("/tablets/%d/command/play-sound", tabletID) }
+                    hx-include={ fmt.Sprintf("#url-%s, #vol-%s, #loop-%s", safeID, safeID, safeID) }
+                >
+                    PLAY
+                </button>
+            </div>
+        </div>
+    }
+}

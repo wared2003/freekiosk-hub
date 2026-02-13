@@ -19,14 +19,15 @@ import (
 
 // ApiServer centralise les dépendances pour le routage
 type ApiServer struct {
-	Echo        *echo.Echo
-	DB          *sql.DB
-	TabletRepo  repositories.TabletRepository
-	ReportRepo  repositories.ReportRepository
-	GroupRepo   repositories.GroupRepository
-	MonitorSvc  services.MonitorService
-	KioskClient clients.KioskClient
-	cfg         config.Config
+	Echo         *echo.Echo
+	DB           *sql.DB
+	TabletRepo   repositories.TabletRepository
+	ReportRepo   repositories.ReportRepository
+	GroupRepo    repositories.GroupRepository
+	MonitorSvc   services.MonitorService
+	KioskClient  clients.KioskClient
+	Cfg          config.Config
+	MediaService services.MediaService
 }
 
 // NewRouter initialise le serveur, les handlers et les routes
@@ -37,17 +38,19 @@ func NewRouter(e *echo.Echo, db *sql.DB,
 	ms services.MonitorService,
 	ks clients.KioskClient,
 	cfg config.Config,
+	mes services.MediaService,
 
 ) *ApiServer {
 	s := &ApiServer{
-		Echo:        e,
-		DB:          db,
-		TabletRepo:  tr,
-		ReportRepo:  rr,
-		GroupRepo:   gr,
-		MonitorSvc:  ms,
-		KioskClient: ks,
-		cfg:         cfg,
+		Echo:         e,
+		DB:           db,
+		TabletRepo:   tr,
+		ReportRepo:   rr,
+		GroupRepo:    gr,
+		MonitorSvc:   ms,
+		KioskClient:  ks,
+		Cfg:          cfg,
+		MediaService: mes,
 	}
 
 	s.setupMiddlewares()
@@ -98,10 +101,10 @@ func (s *ApiServer) setupMiddlewares() {
 
 func (s *ApiServer) setupRoutes() {
 
-	kService := services.NewKioskService(s.TabletRepo, s.GroupRepo, s.KioskClient, s.cfg.KioskPort)
+	kService := services.NewKioskService(s.TabletRepo, s.GroupRepo, s.KioskClient, s.Cfg.KioskPort)
 
 	homeH := NewHtmlHomeHandler(s.TabletRepo, s.ReportRepo, s.GroupRepo)
-	tabletH := NewHtmlTabletHandler(s.TabletRepo, s.ReportRepo, s.GroupRepo, kService)
+	tabletH := NewHtmlTabletHandler(s.TabletRepo, s.ReportRepo, s.GroupRepo, kService, s.MediaService)
 	groupH := NewGroupHandler(s.GroupRepo)
 
 	systemJsonH := NewSystemJSONHandler(s.DB)
@@ -125,6 +128,13 @@ func (s *ApiServer) setupRoutes() {
 		tablets.POST("/:id/command/screensaver-status", tabletH.HandleScreenSaver)
 		tablets.POST("/:id/command/navigate", tabletH.HandleNavigate)
 		tablets.GET("/:id/navigate-modal", tabletH.HandleNavigateModal)
+
+		tablets.GET("/:id/sound-modal", tabletH.HandleSoundModal)
+		tablets.POST("/:id/sound/upload", tabletH.HandleUploadSound)
+		//e.DELETE("/sound/:filename", tabletH.HandleDeleteSound)
+
+		tablets.POST("/:id/command/play-sound", tabletH.HandlePlaySound) // Ta nouvelle route !
+		//tablets.POST("/:id/command/stop-sound", tabletH.HandleStopSound)
 
 	}
 

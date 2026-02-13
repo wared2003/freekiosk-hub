@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -15,14 +16,15 @@ import (
 )
 
 type HtmlTabletHandler struct {
-	tabletRepo repositories.TabletRepository
-	reportRepo repositories.ReportRepository
-	groupRepo  repositories.GroupRepository
-	kService   services.KioskService
+	tabletRepo   repositories.TabletRepository
+	reportRepo   repositories.ReportRepository
+	groupRepo    repositories.GroupRepository
+	kService     services.KioskService
+	mediaService services.MediaService
 }
 
-func NewHtmlTabletHandler(tr repositories.TabletRepository, rr repositories.ReportRepository, gr repositories.GroupRepository, ks services.KioskService) *HtmlTabletHandler {
-	return &HtmlTabletHandler{tabletRepo: tr, reportRepo: rr, groupRepo: gr, kService: ks}
+func NewHtmlTabletHandler(tr repositories.TabletRepository, rr repositories.ReportRepository, gr repositories.GroupRepository, ks services.KioskService, mes services.MediaService) *HtmlTabletHandler {
+	return &HtmlTabletHandler{tabletRepo: tr, reportRepo: rr, groupRepo: gr, kService: ks, mediaService: mes}
 }
 
 func (h *HtmlTabletHandler) HandleDetails(c echo.Context) error {
@@ -268,6 +270,63 @@ func (h *HtmlTabletHandler) HandleScreenSaver(c echo.Context) error {
 		} else {
 			ui.ScreensaverStatusBox(!shouldBeOn, id).Render(c.Request().Context(), c.Response().Writer)
 			ui.Toast(fmt.Sprintf("❌ %s: send screensaver command failed", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
+		}
+	}
+	return nil
+}
+
+func (h *HtmlTabletHandler) HandleSoundModal(c echo.Context) error {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	sounds, err := h.mediaService.List()
+	if err != nil {
+		return ui.Toast("Impossible de charger la bibliothèque", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	return ui.TabSoundModal(sounds, id).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *HtmlTabletHandler) HandleUploadSound(c echo.Context) error {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	file, err := c.FormFile("soundFile")
+	if err != nil {
+		return ui.Toast("Fichier manquant", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	src, err := file.Open()
+	if err != nil {
+		return ui.Toast("Erreur lecture fichier", "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+	defer src.Close()
+
+	_, err = h.mediaService.Upload(file.Filename, src.(io.ReadSeeker))
+	if err != nil {
+		return ui.Toast(err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	sounds, _ := h.mediaService.List()
+
+	return ui.TabSoundList(sounds, id).Render(c.Request().Context(), c.Response().Writer)
+}
+
+func (h *HtmlTabletHandler) HandlePlaySound(c echo.Context) error {
+	idParam := c.Param("id")
+	id, _ := strconv.ParseInt(idParam, 10, 64)
+
+	soundURL := c.FormValue("soundUrl")
+	print("sound-url")
+	volume, _ := strconv.Atoi(c.FormValue("volume"))
+	loop := c.FormValue("loop") == "on"
+
+	report, err := h.kService.PlayAudio(services.Target{TabletID: id}, soundURL, loop, volume)
+	if err != nil {
+		return ui.Toast("Erreur : "+err.Error(), "error").Render(c.Request().Context(), c.Response().Writer)
+	}
+
+	for _, res := range report.Results {
+		if res.Executed {
+			ui.Toast(fmt.Sprintf("🔊 %s : Playback started", res.Name), "success").Render(c.Request().Context(), c.Response().Writer)
+		} else {
+			ui.Toast(fmt.Sprintf("❌ %s : Playback failed", res.Name), "error").Render(c.Request().Context(), c.Response().Writer)
 		}
 	}
 	return nil

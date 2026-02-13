@@ -20,6 +20,8 @@ type Config struct {
 	KioskPort     string
 	RetentionDays int
 	KioskApiKey   string
+	MediaDir      string
+	BaseURL       string
 }
 
 func Load() *Config {
@@ -38,6 +40,8 @@ func Load() *Config {
 		KioskPort:     getEnv("KIOSK_PORT", "8080"),
 		RetentionDays: parseInt(getEnv("RETENTION_DAYS", "31")),
 		KioskApiKey:   getEnv("KIOSK_API_KEY", ""),
+		MediaDir:      getEnv("MEDIA_DIR", "media"),
+		BaseURL:       getEnv("BASE_URL", "localhost:8081"),
 	}
 
 	initLogger(cfg.LogLevel)

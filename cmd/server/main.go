@@ -113,6 +113,8 @@ func main() {
 	}
 	slog.Info("✅ Database schema is ready")
 
+	mediaService := services.NewMediaService(cfg.MediaDir, cfg.BaseURL)
+
 	// 5. Monitoring Service initialization
 	monitorSvc := services.NewMonitorService(
 		tabletRepo,
@@ -138,7 +140,8 @@ func main() {
 
 	e := echo.New()
 	e.Renderer = &api.TemplRenderer{}
-	api.NewRouter(e, db.DB, tabletRepo, reportRepo, groupRepo, monitorSvc, kioskClient, *cfg)
+	api.NewRouter(e, db.DB, tabletRepo, reportRepo, groupRepo, monitorSvc, kioskClient, *cfg, mediaService)
+	e.Static("/media", cfg.MediaDir)
 	go func() {
 		slog.Info("🌐 Web Server starting", "port", cfg.ServerPort)
 		if err := e.Start(":" + cfg.ServerPort); err != nil && err != http.ErrServerClosed {
