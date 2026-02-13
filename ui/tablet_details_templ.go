@@ -1751,14 +1751,14 @@ func TabSoundModal(sounds []services.SoundFileInfo, tabletID int64) templ.Compon
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-swap=\"none\" class=\"space-y-3\"><div class=\"relative\"><textarea name=\"tts_text\" class=\"textarea textarea-bordered w-full bg-slate-50 text-slate-800 text-sm focus:bg-white transition-all min-h-[100px] pb-12\" placeholder=\"Type what the kiosk should say...\"></textarea><div class=\"absolute bottom-2 left-2 right-2 flex justify-between items-center px-2 py-1 bg-white/90 rounded-md border border-slate-100 shadow-sm\"><div class=\"flex items-center gap-3\"><div class=\"flex items-center gap-1\"><span class=\"text-[9px] font-black text-slate-400 uppercase\">Lang</span> <select name=\"lang\" class=\"select select-ghost select-xs text-[10px] font-bold focus:bg-transparent\"><option value=\"fr\">🇫🇷 FR</option> <option value=\"en\" selected>🇺🇸 EN</option> <option value=\"es\">🇪🇸 ES</option> <option value=\"de\">🇩🇪 DE</option> <option value=\"it\">🇮🇹 IT</option> <option value=\"pt\">🇵🇹 PT</option> <option value=\"ru\">🇷🇺 RU</option> <option value=\"ar\">🇸🇦 AR</option> <option value=\"tr\">🇹🇷 TR</option> <option value=\"pl\">🇵🇱 PL</option> <option value=\"zh-CN\">🇨🇳 ZH</option> <option value=\"ja\">🇯🇵 JP</option> <option value=\"ko\">🇰🇷 KO</option> <option value=\"vi\">🇻🇳 VI</option> <option value=\"th\">🇹🇭 TH</option></select></div><div class=\"h-4 w-[1px] bg-slate-200\"></div><label class=\"flex items-center gap-1 cursor-pointer\"><span class=\"text-[9px] font-black text-slate-400 uppercase\">Loop</span> <input type=\"checkbox\" name=\"loop\" class=\"checkbox checkbox-primary checkbox-xs\"></label></div><div class=\"flex items-center gap-2\"><span class=\"text-[10px] font-bold text-slate-400\">VOL</span> <input type=\"range\" name=\"volume\" min=\"0\" max=\"100\" value=\"80\" class=\"range range-xs range-primary w-24\"></div></div></div><button type=\"submit\" class=\"btn btn-sm btn-block btn-primary text-white font-bold uppercase text-[10px] tracking-widest\">📢 Broadcast Announcement</button></form></div></div><div class=\"p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2\"><button class=\"btn btn-sm btn-ghost text-[10px] uppercase font-bold\" onclick=\"this.closest('dialog').remove()\">Fermer</button> <button class=\"btn btn-sm btn-error btn-outline text-[10px] font-bold uppercase\" hx-post=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "\" hx-swap=\"none\" class=\"space-y-3\"><div class=\"relative\"><textarea name=\"tts_text\" maxlength=\"200\" class=\"textarea textarea-bordered w-full bg-slate-50 text-slate-800 text-sm focus:bg-white transition-all min-h-[100px] pb-12\" placeholder=\"Type what the kiosk should say...\"></textarea><div class=\"absolute bottom-2 left-2 right-2 flex justify-between items-center px-2 py-1 bg-white/90 rounded-md border border-slate-100 shadow-sm\"><div class=\"flex items-center gap-3\"><div class=\"flex items-center gap-1\"><span class=\"text-[9px] font-black text-slate-400 uppercase\">Lang</span> <select name=\"lang\" class=\"select select-ghost select-xs text-[10px] font-bold focus:bg-transparent\"><option value=\"fr\">🇫🇷 FR</option> <option value=\"en\" selected>🇺🇸 EN</option> <option value=\"es\">🇪🇸 ES</option> <option value=\"de\">🇩🇪 DE</option> <option value=\"it\">🇮🇹 IT</option> <option value=\"pt\">🇵🇹 PT</option> <option value=\"ru\">🇷🇺 RU</option> <option value=\"ar\">🇸🇦 AR</option> <option value=\"tr\">🇹🇷 TR</option> <option value=\"pl\">🇵🇱 PL</option> <option value=\"zh-CN\">🇨🇳 ZH</option> <option value=\"ja\">🇯🇵 JP</option> <option value=\"ko\">🇰🇷 KO</option> <option value=\"vi\">🇻🇳 VI</option> <option value=\"th\">🇹🇭 TH</option></select></div><div class=\"h-4 w-[1px] bg-slate-200\"></div><label class=\"flex items-center gap-1 cursor-pointer\"><span class=\"text-[9px] font-black text-slate-400 uppercase\">Loop</span> <input type=\"checkbox\" name=\"loop\" class=\"checkbox checkbox-primary checkbox-xs\"></label></div><div class=\"flex items-center gap-2\"><span class=\"text-[10px] font-bold text-slate-400\">VOL</span> <input type=\"range\" name=\"volume\" min=\"0\" max=\"100\" value=\"80\" class=\"range range-xs range-primary w-24\"></div></div></div><button type=\"submit\" class=\"btn btn-sm btn-block btn-primary text-white font-bold uppercase text-[10px] tracking-widest\">📢 Speak</button></form></div></div><div class=\"p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2\"><button class=\"btn btn-sm btn-ghost text-[10px] uppercase font-bold\" onclick=\"this.closest('dialog').remove()\">Fermer</button> <button class=\"btn btn-sm btn-error btn-outline text-[10px] font-bold uppercase\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var82 string
 		templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/stop-sound", tabletID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 673, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 674, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var82))
 		if templ_7745c5c3_Err != nil {
@@ -1808,7 +1808,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var84 string
 			templ_7745c5c3_Var84, templ_7745c5c3_Err = templ.JoinStringErrs(sound.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 697, Col: 89}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 698, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var84))
 			if templ_7745c5c3_Err != nil {
@@ -1821,7 +1821,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var85 string
 			templ_7745c5c3_Var85, templ_7745c5c3_Err = templ.JoinStringErrs(sound.Extension)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 698, Col: 109}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 699, Col: 109}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var85))
 			if templ_7745c5c3_Err != nil {
@@ -1834,7 +1834,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var86 string
 			templ_7745c5c3_Var86, templ_7745c5c3_Err = templ.JoinStringErrs(sound.URL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 700, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 701, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var86))
 			if templ_7745c5c3_Err != nil {
@@ -1847,7 +1847,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var87 string
 			templ_7745c5c3_Var87, templ_7745c5c3_Err = templ.JoinStringErrs("url-" + safeID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 705, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 706, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var87))
 			if templ_7745c5c3_Err != nil {
@@ -1860,7 +1860,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var88 string
 			templ_7745c5c3_Var88, templ_7745c5c3_Err = templ.JoinStringErrs(sound.URL)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 705, Col: 93}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 706, Col: 93}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var88))
 			if templ_7745c5c3_Err != nil {
@@ -1873,7 +1873,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var89 string
 			templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.JoinStringErrs("vol-" + safeID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 714, Col: 44}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 715, Col: 44}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var89))
 			if templ_7745c5c3_Err != nil {
@@ -1886,7 +1886,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var90 string
 			templ_7745c5c3_Var90, templ_7745c5c3_Err = templ.JoinStringErrs("loop-" + safeID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 724, Col: 45}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 725, Col: 45}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var90))
 			if templ_7745c5c3_Err != nil {
@@ -1899,7 +1899,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var91 string
 			templ_7745c5c3_Var91, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tablets/%d/command/play-sound", tabletID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 730, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 731, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var91))
 			if templ_7745c5c3_Err != nil {
@@ -1912,7 +1912,7 @@ func TabSoundList(sounds []services.SoundFileInfo, tabletID int64) templ.Compone
 			var templ_7745c5c3_Var92 string
 			templ_7745c5c3_Var92, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("#url-%s, #vol-%s, #loop-%s", safeID, safeID, safeID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 732, Col: 98}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `ui/tablet_details.templ`, Line: 733, Col: 98}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var92))
 			if templ_7745c5c3_Err != nil {

@@ -622,6 +622,7 @@ templ TabSoundModal(sounds []services.SoundFileInfo, tabletID int64) {
                         <div class="relative">
                             <textarea 
                                 name="tts_text" 
+                                maxlength="200"
                                 class="textarea textarea-bordered w-full bg-slate-50 text-slate-800 text-sm focus:bg-white transition-all min-h-[100px] pb-12" 
                                 placeholder="Type what the kiosk should say..."></textarea>
                             
@@ -660,7 +661,7 @@ templ TabSoundModal(sounds []services.SoundFileInfo, tabletID int64) {
                             </div>
                         </div>
                         <button type="submit" class="btn btn-sm btn-block btn-primary text-white font-bold uppercase text-[10px] tracking-widest">
-                            📢 Broadcast Announcement
+                            📢 Speak
                         </button>
                     </form>
                 </div>
